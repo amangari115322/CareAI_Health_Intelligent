@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+package-lock.json.bak
+
+# Next.js Build Output
+.next/
+frontend/.next/
+frontend/out/
+*.tsbuildinfo
+frontend/tsconfig.tsbuildinfo
+
+# Python Virtual Environments & Bytecode
+venv/
+backend/venv/
+__pycache__/
+*/__pycache__/
+*/*/__pycache__/
+*.py[cod]
+*$py.class
+*.sqlite3-journal
+
+# Environment Secrets & Private Config
+.env
+backend/.env
+.env.local
+frontend/.env.local
+.env.*.local
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Logs & Temporary Files
+*.log
+backend/generated_projects/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
