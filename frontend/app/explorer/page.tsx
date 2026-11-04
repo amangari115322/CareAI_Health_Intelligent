@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Search,
   Download,
@@ -21,7 +22,8 @@ import {
 import { api, ProviderRecord } from "../../lib/caredataApi";
 import { EvidenceBadge } from "../../components/EvidenceBadge";
 
-export default function DataExplorerPage() {
+function ExplorerContent() {
+  const searchParams = useSearchParams();
   const [records, setRecords] = useState<ProviderRecord[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -43,6 +45,19 @@ export default function DataExplorerPage() {
   const [selectedStatus, setSelectedStatus] = useState("");
   const [sortBy, setSortBy] = useState("accepted_doctor_name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+
+  // Read search and filter params from URL on load/change
+  useEffect(() => {
+    const q = searchParams.get("q") || searchParams.get("search");
+    const spec = searchParams.get("specialty");
+    const qual = searchParams.get("quality");
+    const sub = searchParams.get("suburb");
+
+    if (q !== null && q !== undefined) setSearch(q);
+    if (spec) setSelectedSpecialty(spec);
+    if (qual) setSelectedQuality(qual);
+    if (sub) setSelectedSuburb(sub);
+  }, [searchParams]);
 
   // Column visibility
   const [visibleColumns, setVisibleColumns] = useState({
@@ -640,17 +655,32 @@ export default function DataExplorerPage() {
             )}
           </div>
 
-          <div className="pt-3 border-t border-border">
-            <button
-              onClick={() => setSelectedProvider(null)}
-              className="w-full py-1.5 text-xs font-medium rounded-md border border-border hover:bg-surface-muted text-foreground"
-            >
-              Close Dossier
-            </button>
+            <div className="pt-3 border-t border-border">
+              <button
+                onClick={() => setSelectedProvider(null)}
+                className="w-full py-1.5 text-xs font-medium rounded-md border border-border hover:bg-surface-muted text-foreground"
+              >
+                Close Dossier
+              </button>
+            </div>
           </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+export default function DataExplorerPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="py-12 text-center text-xs text-foreground-muted flex items-center justify-center gap-2">
+          <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+          <span>Loading Explorer...</span>
         </div>
-      </>
-    )}
-  </div>
-);
+      }
+    >
+      <ExplorerContent />
+    </Suspense>
+  );
 }

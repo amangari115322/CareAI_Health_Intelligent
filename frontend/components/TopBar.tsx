@@ -12,6 +12,7 @@ import {
   BookOpen,
   User,
   Activity,
+  X,
 } from "lucide-react";
 import { api, ActiveJob } from "../lib/caredataApi";
 import { ProcessingTrackerModal } from "./ProcessingTrackerModal";
@@ -101,8 +102,18 @@ export const TopBar: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search records, clinics or specialties..."
-            className="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-border bg-surface-muted/60 text-foreground placeholder:text-foreground-muted/70 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all shadow-sm"
+            className="w-full pl-10 pr-9 py-2 text-xs rounded-xl border border-border bg-surface-muted/60 text-foreground placeholder:text-foreground-muted/70 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all shadow-sm"
           />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-foreground-muted hover:text-foreground transition-colors"
+              title="Clear search"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </form>
 
         {/* Right: Actions, Global Selector, Theme Switch, Notification, User Profile */}

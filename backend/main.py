@@ -1171,9 +1171,17 @@ def save_settings(new_settings: Dict[str, Any]):
     conn = get_connection()
     c = conn.cursor()
     c.execute("INSERT OR REPLACE INTO settings (key, value_json) VALUES ('app_config', ?)", (json.dumps(new_settings),))
+    
+    # Synchronize default research location with projects table
+    gen = new_settings.get("general", {})
+    loc = gen.get("default_location")
+    proj_id = gen.get("default_project", "sydney-gp-pilot")
+    if loc is not None:
+        c.execute("UPDATE projects SET research_location = ? WHERE id = ?", (str(loc).strip(), proj_id))
+        
     conn.commit()
     conn.close()
-    log_activity("settings", "Updated System Settings", "Modified project defaults and review preferences")
+    log_activity("settings", "Updated System Settings", f"Modified project defaults (Location: {loc})")
     return {"message": "Settings saved successfully"}
 
 @app.post("/api/settings/reset")
