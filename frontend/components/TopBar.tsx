@@ -17,6 +17,7 @@ import {
 import { api, ActiveJob } from "../lib/caredataApi";
 import { ProcessingTrackerModal } from "./ProcessingTrackerModal";
 import { PlatformGuideModal } from "./PlatformGuideModal";
+import { GlobalJurisdictionDropdown } from "./GlobalJurisdictionDropdown";
 
 export const TopBar: React.FC = () => {
   const pathname = usePathname();
@@ -118,22 +119,12 @@ export const TopBar: React.FC = () => {
 
         {/* Right: Actions, Global Selector, Theme Switch, Notification, User Profile */}
         <div className="flex items-center gap-3">
-          {/* Global Jurisdiction Selector */}
-          <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-surface text-xs font-medium text-foreground shadow-sm">
-            <Globe2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
-            <select
+          {/* Global Jurisdiction Selector (Custom High-Contrast Dropdown) */}
+          <div className="hidden lg:block">
+            <GlobalJurisdictionDropdown
               value={jurisdiction}
-              onChange={(e) => setJurisdiction(e.target.value)}
-              className="bg-transparent text-foreground text-xs font-medium focus:outline-none cursor-pointer"
-              title="Select Regulatory Healthcare Jurisdiction"
-            >
-              <option value="Global" className="dark:bg-slate-900">🌐 Global Standards</option>
-              <option value="Australia" className="dark:bg-slate-900">🇦🇺 Australia (AHPRA)</option>
-              <option value="USA" className="dark:bg-slate-900">🇺🇸 United States (NPI)</option>
-              <option value="India" className="dark:bg-slate-900">🇮🇳 India (NMC / ABDM)</option>
-              <option value="Nepal" className="dark:bg-slate-900">🇳🇵 Nepal (NMC)</option>
-              <option value="International" className="dark:bg-slate-900">🇷🇺 International (WHO)</option>
-            </select>
+              onChange={setJurisdiction}
+            />
           </div>
 
           {/* Guide & Downloads Button */}

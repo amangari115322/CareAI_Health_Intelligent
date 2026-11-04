@@ -127,6 +127,24 @@ input, select, textarea {
   color: inherit;
 }
 
+/* Ensure native select option popups have high contrast in both dark and light modes */
+select option {
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
+html.dark select option,
+html.dark option {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+html.light select option,
+html.light option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
 input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus, 

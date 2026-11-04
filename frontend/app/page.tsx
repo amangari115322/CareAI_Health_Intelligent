@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { CareDataLogo } from "../components/CareDataLogo";
 import { PlatformGuideModal } from "../components/PlatformGuideModal";
+import { GlobalJurisdictionDropdown } from "../components/GlobalJurisdictionDropdown";
 import { api } from "../lib/caredataApi";
 
 export default function LandingPage() {
@@ -136,21 +137,12 @@ export default function LandingPage() {
 
           {/* Theme & CTA Button */}
           <div className="flex items-center gap-3">
-            {/* Global Jurisdiction Selector */}
-            <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-surface text-[11px] font-semibold text-foreground shadow-subtle">
-              <Globe2 className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400 flex-shrink-0" />
-              <select
+            {/* Global Jurisdiction Selector (Custom High-Contrast Dropdown) */}
+            <div className="hidden lg:block">
+              <GlobalJurisdictionDropdown
                 value={selectedJurisdiction}
-                onChange={(e) => setSelectedJurisdiction(e.target.value)}
-                className="bg-transparent text-foreground font-semibold focus:outline-none cursor-pointer"
-              >
-                <option value="Global">🌐 Global Standards</option>
-                <option value="Australia">🇦🇺 Australia (AHPRA / RACGP)</option>
-                <option value="USA">🇺🇸 United States (NPI / CMS)</option>
-                <option value="India">🇮🇳 India (NMC / ABDM)</option>
-                <option value="Nepal">🇳🇵 Nepal (NMC / MoHP)</option>
-                <option value="International">🇷🇺 International (WHO ICD-11)</option>
-              </select>
+                onChange={setSelectedJurisdiction}
+              />
             </div>
 
             {/* Quick Guide Trigger */}
