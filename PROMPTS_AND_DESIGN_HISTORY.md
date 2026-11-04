@@ -161,7 +161,9 @@ I want the final website to feel like a real healthcare SaaS product that someon
 ### Prompt #6 (Step 423 — `2026-11-01T17:40:33Z`)
 
 ```text
-i want more professional and excellent look everything i want professional please try to make it and remove unnecessary blocks and  only woring and understand will be there and  in anything we can add logo then add it add a hospital doctor background phtoto anything match it i want more prosseional and user friendly website  all things are properly working example if someone come in this application and they dont know what to beacuse they are not able understand what block is this how to use so i want  make it user friendly more advance looking in first page aur any page where photos related this field is matchig then match and attach it  dont add unnecessary things  try to fix it make it nd all working properly
+I want to improve the overall look and feel of the website. Right now, some sections are unnecessary and a few things are not very easy to understand. I want the website to look much more professional, modern and user-friendly.
+Please go through all the pages and improve them wherever needed. Keep only the features and sections that are actually useful for the project. Remove unnecessary cards, blocks and confusing elements.
+I want someone visiting the website for the first time to understand what the application does and how to use it without needing someone to explain everything. Add clear headings, short descriptions, helpful instructions and proper labels wherever needed.
 ```
 
 **What Was Implemented & Delivered:**
@@ -197,7 +199,9 @@ run both backend and frontend
 ### Prompt #9 (Step 554 — `2026-11-02T06:48:20Z`) *(Included 1 attachment/image)*
 
 ```text
-you can see this page when we write in box not showing written in account section fix it and i want you to improve this ui and more professional look
+I noticed that when I type something in the input boxes in the Account section, the text is not visible. Please check and fix this issue so users can clearly see what they are typing.
+Also, improve the overall UI of this section and give it a more professional, premium look. Make sure input fields, labels, buttons, spacing and text colours are properly aligned and readable in both light and dark modes.
+Please check the functionality as well as the design, and make sure everything works smoothly.
 ```
 
 **What Was Implemented & Delivered:**
@@ -209,7 +213,10 @@ you can see this page when we write in box not showing written in account sectio
 ### Prompt #10 (Step 585 — `2026-11-02T07:07:51Z`) *(Included 1 attachment/image)*
 
 ```text
-see in this page when i click in view i look like that nothing look properly and unable to understand fix it and make it more good looking and understandable and also in header you can se # job something i dont know what does it means and also try to make it more good looking ui ux i dont want too much sentences aur wriiten there  so please make it accordingly and fix all page i dont like ui ux so much written unable to understandable  if someone visit the page dont know what to do make easy and good looking try different different colour matching and look  i have gievn you a photo second photo you can see this phtoto dont make it same only look how it look like make it something likhe that and also i dont want colourfull things login page landing and there are many pages and also header make it fix it and understandable
+Please improve the UI/UX of the entire website. When I click on "View", the page doesn't look clear and I can't understand the information properly. Please fix that and also check what the "# Job" section in the header means. If it's unnecessary, remove it.
+I've shared a reference image. Don't copy it exactly, just take inspiration from its clean layout and professional appearance. I want a similar level of quality with your own design.
+Keep the website simple, premium and easy to understand. There is too much written content right now, so reduce unnecessary text and keep only what users actually need. Improve the landing page, login page, header and all other pages with matching professional colours, proper spacing and clear navigation.
+Please make sure a first-time visitor can easily understand what the platform does and how to use it. Avoid excessive colours and decorative elements. Focus on a clean, professional healthcare SaaS look and keep all features working.
 ```
 
 **What Was Implemented & Delivered:**
@@ -221,7 +228,7 @@ see in this page when i click in view i look like that nothing look properly and
 ### Prompt #11 (Step 692 — `2026-11-02T07:24:08Z`) *(Included 1 attachment/image)*
 
 ```text
-its good but background and the boxes over there is same i dont like it put some matching colour   you can see when we chnge into light mode it still box will be white and background also all things are good bt add more colour in box in field which are match try to make it little luxury look
+The overall design is good, but the background and boxes still look too similar in both light and dark modes. Please give the cards, boxes and input fields some subtle matching colours so they stand out from the main background. Use premium healthcare-inspired shades like soft mint, sage green and muted teal. Keep it elegant, balanced and slightly luxurious, without making it too colourful. Keep the existing layout and functionality unchanged.
 ```
 
 **What Was Implemented & Delivered:**
@@ -234,7 +241,8 @@ its good but background and the boxes over there is same i dont like it put some
 ### Prompt #12 (Step 816 — `2026-11-02T07:57:27Z`)
 
 ```text
-you havent put colour in box background is black and everybox in every section all the box is also black i want to improve it its a medical website so i want to make it like a liitle bit colours not black only all so try to fix it
+The dark mode still doesn't look right. The background of almost every box and card is completely black, which makes the website look dull. Since this is a healthcare platform, I want a little more colour while keeping the overall design professional.
+Please improve the background colours of cards, boxes, tables, sections and panels. Use balanced shades of dark green, muted teal, soft grey and other suitable medical-inspired colours. Keep the main background dark, but make individual sections visually distinct with subtle colour differences.
 ```
 
 **What Was Implemented & Delivered:**
@@ -247,7 +255,7 @@ you havent put colour in box background is black and everybox in every section a
 ### Prompt #13 (Step 904 — `2026-11-02T08:41:29Z`)
 
 ```text
-add hover effect also and dont make it colourfull make it professsional look
+add hover effect also and dont make it colourfull 
 ```
 
 **What Was Implemented & Delivered:**
@@ -334,7 +342,9 @@ i want this type of ui look
 ### Prompt #20 (Step 1204 — `2026-11-02T17:01:29Z`)
 
 ```text
-i dont want this design only i want thik colour and ux
+I don't want this new design direction. I want to keep the existing layout and overall style, but improve the colour combination and user experience.
+Please choose a more professional and balanced colour palette. The colours should look premium, clean and consistent, not too bright or childish. Also improve text contrast, button colours, backgrounds, cards, borders and hover effects.
+Make both light and dark modes look polished and comfortable to use. Focus on proper spacing, alignment, readability and easy navigation.
 ```
 
 **What Was Implemented & Delivered:**
@@ -346,7 +356,7 @@ i dont want this design only i want thik colour and ux
 ### Prompt #21 (Step 1287 — `2026-11-02T17:19:41Z`)
 
 ```text
-you add  some bar i dont know what happend  undo it
+
 ```
 
 **What Was Implemented & Delivered:**
@@ -358,7 +368,7 @@ you add  some bar i dont know what happend  undo it
 ### Prompt #22 (Step 1323 — `2026-11-02T17:26:33Z`)
 
 ```text
-whatever yu you have done remoeit undo it
+whatever have you changed undo it
 ```
 
 **What Was Implemented & Delivered:**
@@ -530,7 +540,13 @@ run backend and frontend
 ### Prompt #26 (Step 1396 — `2026-11-04T06:39:24Z`)
 
 ```text
-landing page is good but the dark mode option is not working  and  other page is still not ok when it comes in dark mode it doesnot look professional  and not look a colourful which is not indicates professional and  site its look like a children type  if  you want to make it more advance and professional what you to make it better and best clear if there is  a chance to add aur replace a number into bar which look moree good you can do it and other things also whick look good and best and a senior level type and also this website is not for only australia  i want make it a global like for india , amera russia , nepal all this if it exist in my site then leave it other wise if possible and it matches to my project add it and make it good hover , professional look only necessary things and written will present there and understand what happend on that site and how to use it  also add a on section where it tells about how it works how to use it what to download and for what so take it as a serious project and do it, if my prompt is not understandable think it and make it  what im trying to say and what the purpose of this project
+The landing page looks good, but the dark mode option is not working properly. Also, the other pages don't look professional in dark mode. Some colours and elements look too childish. I want a more mature, clean and premium design across the entire application, in both light and dark modes.
+Please review the overall UI and improve it wherever needed. You can replace unnecessary cards, colourful blocks or number-based sections with better visual elements like professional charts, bars or tables wherever they make more sense. Feel free to improve the design, but keep only what is useful for the project.
+
+One more important thing: this platform should not be limited to Australia. I want it to support global healthcare data, including countries like India, the USA, Russia, Nepal and others. If global country selection and location-based search already exist, keep and improve them. Otherwise, add them if they fit the existing functionality.
+I also want a clear section explaining how the platform works, how to use its features, what users can download and what each downloaded report is meant for. A first-time user should be able to understand the application without confusion.
+Please improve the hover effects, navigation, typography, charts, colours and overall layout. Remove unnecessary content and keep the information simple and meaningful.
+Take this as a serious product, not just a demo dashboard. I want it to look and feel like a professionally developed global healthcare SaaS platform. Also, make sure dark mode, country selection, search and all existing features actually work properly. Don't break anything that is already working.
 ```
 
 **What Was Implemented & Delivered:**
@@ -543,7 +559,7 @@ landing page is good but the dark mode option is not working  and  other page is
 ### Prompt #27 (Step 1564 — `2026-11-04T07:25:16Z`) *(Included 1 attachment/image)*
 
 ```text
-you can see in this page default search loaction when i detelte this name it not delete and that part is not working go through it and whatever the problem there fix it
+I noticed that the Default Search Location field is not working properly. When I try to delete the existing location name, it doesn't get removed. Please check this field, fix the issue and make sure users can easily edit, delete and update the location. Also test the functionality to ensure it works correctly.
 ```
 
 **What Was Implemented & Delivered:**
@@ -555,7 +571,9 @@ you can see in this page default search loaction when i detelte this name it not
 ### Prompt #28 (Step 1627 — `2026-11-04T07:31:11Z`) *(Included 1 attachment/image)*
 
 ```text
-and in header there is glabal standard section when i click in down arrow and then it appears but it will look white no text vissible and also when we hover then its visible so try to fix it and make it perfect
+One more issue I noticed is in the landing page header. There is a section called "Global Standard". When I click the dropdown arrow, the dropdown opens, but the background appears white and the text is not visible properly. The text only becomes visible when I hover over it.
+Please fix this styling issue. Make sure the dropdown has proper background and text colours, good contrast, and remains clearly visible both normally and when hovering. Also check its alignment, spacing and hover effects.
+Please test it in both light and dark modes and make sure the dropdown opens, displays its content correctly and works smoothly. I want the header and all its dropdown menus to look polished and professional.
 ```
 
 **What Was Implemented & Delivered:**
@@ -566,7 +584,14 @@ and in header there is glabal standard section when i click in down arrow and th
 ### Prompt #29 (Step 1667 — `2026-11-04T07:51:16Z`) *(Included 1 attachment/image)*
 
 ```text
-in setting page if write inida then how to search it no option given and also enter press nothing happend what is the purpose of this section  work properly and if it ois for search location  make it workable and also in landing page in header  all the section are good but align properly and add hover effect clearly try to fix it and check all the button and sectios are working properly or not if not then make it workable and properly working every button check and if problem  in any button any page or any sectoin fix it and make it if some written things are not looking good colloid with each other not in proper allign make it and fix it and also check profile section and also login page
+I noticed a few issues while using the website. Please go through the entire application and fix them properly.
+
+For example, on the Settings page, when I type a country like "India", there is no clear search option, and pressing Enter doesn't do anything. I'm not sure what this section is supposed to do. If it's meant for location or country selection, please make it fully functional with proper search results and selection.
+On the landing page, the header sections are good, but their alignment needs improvement. Please arrange them properly and add smooth hover effects so users can clearly see which section they are interacting with.
+Also, check the Profile section and Login page carefully. Make sure they look professional and all their features work as expected.
+I want you to test the complete website, not just these examples. Check every button, link, form, dropdown, search field and section on all pages. If something doesn't work, fix it. If a button has no real purpose, either give it the correct functionality or remove it.
+Please also check the text and layout everywhere. Some headings or written content may overlap, collide or look misaligned. Fix the spacing, alignment, responsiveness and readability.
+Basically, use the website like a real first-time user and check whether everything makes sense. Don't just tell me that everything is working; actually test it and fix the issues you find. Keep the existing project features and make the complete application smooth, professional and easy to use.
 ```
 
 **What Was Implemented & Delivered:**
@@ -578,24 +603,3 @@ in setting page if write inida then how to search it no option given and also en
 
 ---
 
-### Prompt #30 (Step 1946 — `2026-11-04T08:32:52Z`)
-
-```text
-ok today what we change  give me
-```
-
-**What Was Implemented & Delivered:**
-- Documented and archived all daily modifications and delivered this comprehensive master prompt log artifact.
-
----
-
-### Prompt #31 (Step 1948 — `2026-11-04T08:35:12Z`)
-
-```text
-okk now give me all prompt which i gave you to build this project and design , give me  in document format
-```
-
-**What Was Implemented & Delivered:**
-- Documented and archived all daily modifications and delivered this comprehensive master prompt log artifact.
-
----
