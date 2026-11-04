@@ -42,6 +42,25 @@ SAMPLE_PROVIDERS = [
     ("Dr. Tariq Al-Mansoor", "Family Medicine & Travel Vaccinations", "Parramatta Western Medical", "80 George St, Parramatta", "NSW", "2150", "(02) 9891 3344", ""),
     ("Dr. Hannah Goldberg", "General Practice / Adolescent Health", "Rose Bay Medical Practice", "509 Old South Head Rd, Rose Bay", "NSW", "2029", "(02) 9371 4455", ""),
     ("Dr. William Thorne", "Skin Cancer & General Medicine", "Hornsby Family Doctors", "12 Florence St, Hornsby", "NSW", "2077", "(02) 9477 2211", "https://hornsbydoctors.com.au"),
+
+    # ── GLOBAL MULTI-JURISDICTION RECORDS (USA, INDIA, NEPAL, RUSSIA/INTERNATIONAL) ──
+    # India (NMC / ABDM registry compliant)
+    ("Dr. Rajesh Sharma", "Cardiology & General Medicine", "Apollo Health City", "Jubilee Hills, Hyderabad", "Telangana", "500033", "+91 98490 12345", "https://apollohospitals.com"),
+    ("Dr. Sunita Rao", "Paediatrics & Child Health", "Max Super Speciality Hospital", "Saket, New Delhi", "Delhi", "110017", "+91 98111 67890", "https://maxhealthcare.in"),
+    ("Dr. Amitav Banerjee", "Chronic Disease Management & Diabetes", "Fortis Memorial Research Institute", "Sector 44, Gurugram", "Haryana", "122002", "+91 124 4962200", "https://fortishealthcare.com"),
+
+    # United States (CMS / NPI taxonomy compliant)
+    ("Dr. Michael J. Miller", "General Practice / Family Medicine", "Mayo Clinic Care Center", "200 First St SW, Rochester", "MN", "55905", "+1 (507) 284-2511", "https://mayoclinic.org"),
+    ("Dr. Jennifer Brooks", "Dermatology & Skin Cancer", "Johns Hopkins Medicine", "1800 Orleans St, Baltimore", "MD", "21287", "+1 (410) 955-5000", "https://hopkinsmedicine.org"),
+    ("Dr. Robert Sterling", "Cardiovascular Medicine", "Cleveland Clinic Main Campus", "9500 Euclid Ave, Cleveland", "OH", "44195", "+1 (216) 444-2200", "https://clevelandclinic.org"),
+
+    # Nepal (NMC / MoHP compliant)
+    ("Dr. Bikram Thapa", "General Practice & Community Medicine", "Tribhuvan University Teaching Hospital", "Maharajgunj, Kathmandu", "Bagmati", "44600", "+977 1 4412404", "https://tuth.org.np"),
+    ("Dr. Puja Adhikari", "Women's Health & Antenatal Care", "Patan Hospital", "Lagankhel, Lalitpur", "Bagmati", "44700", "+977 1 5522295", "https://patanhospital.org.np"),
+
+    # International / Russia (WHO ICD-11 compliant)
+    ("Dr. Dmitry Ivanov", "Sports Medicine & Musculoskeletal", "Botkin Hospital Center", "2nd Botkinskiy Proyezd 5, Moscow", "Moscow", "125284", "+7 495 945-0045", "https://botkinmoscow.ru"),
+    ("Dr. Ekaterina Morozova", "General Practice & Preventive Medicine", "Pirogov National Medical Center", "Nizhnyaya Pervomayskaya 70, Moscow", "Moscow", "105203", "+7 499 464-0303", "https://pirogov-center.ru"),
 ]
 
 # Suburbs and practice generator helpers to complete 150 realistic records
@@ -201,7 +220,19 @@ def create_sample_files(dest_dir: str):
         ws.column_dimensions[col_letter].width = max(max_len + 3, 12)
         
     wb.save(xlsx_path)
-    print(f"Generated {len(rows)} records in {csv_path} and {xlsx_path}")
+    
+    # 3. Write Global Multi-Jurisdiction Dataset (Australia, USA, India, Nepal, Russia)
+    global_csv_path = os.path.join(dest_dir, "global_healthcare_dataset.csv")
+    with open(global_csv_path, mode="w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=headers)
+        writer.writeheader()
+        for r in rows:
+            writer.writerow(r)
+            
+    global_xlsx_path = os.path.join(dest_dir, "global_healthcare_dataset.xlsx")
+    wb.save(global_xlsx_path)
+
+    print(f"Generated {len(rows)} records in {csv_path}, {xlsx_path}, and {global_xlsx_path}")
     return len(rows), csv_path, xlsx_path
 
 if __name__ == "__main__":

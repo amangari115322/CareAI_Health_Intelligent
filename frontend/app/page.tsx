@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -23,22 +23,58 @@ import {
   Layers,
   ChevronRight,
   ExternalLink,
+  Globe2,
+  BookOpen,
+  Download,
+  AlertCircle,
 } from "lucide-react";
 import { CareDataLogo } from "../components/CareDataLogo";
+import { PlatformGuideModal } from "../components/PlatformGuideModal";
+import { api } from "../lib/caredataApi";
 
 export default function LandingPage() {
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [activeTab, setActiveTab] = useState<"raw" | "cleaned">("cleaned");
+  const [guideModalOpen, setGuideModalOpen] = useState(false);
+  const [selectedJurisdiction, setSelectedJurisdiction] = useState("Global");
+  const [guideSubTab, setGuideSubTab] = useState<"how-it-works" | "how-to-use" | "downloads">("how-it-works");
+  const [downloading, setDownloading] = useState<string | null>(null);
+
+  useEffect(() => {
+    const saved = typeof window !== "undefined" ? localStorage.getItem("caredata_theme") : null;
+    const initialTheme = saved === "light" ? "light" : "dark";
+    setTheme(initialTheme);
+    if (initialTheme === "dark") {
+      document.documentElement.classList.add("dark");
+      document.documentElement.classList.remove("light");
+    } else {
+      document.documentElement.classList.add("light");
+      document.documentElement.classList.remove("dark");
+    }
+  }, []);
 
   const toggleTheme = () => {
     if (theme === "dark") {
+      document.documentElement.classList.remove("dark");
       document.documentElement.classList.add("light");
       setTheme("light");
       localStorage.setItem("caredata_theme", "light");
     } else {
       document.documentElement.classList.remove("light");
+      document.documentElement.classList.add("dark");
       setTheme("dark");
       localStorage.setItem("caredata_theme", "dark");
+    }
+  };
+
+  const handleDownload = async (reportType: string, filename: string) => {
+    setDownloading(reportType);
+    try {
+      await api.downloadReport(reportType, filename);
+    } catch (e) {
+      alert("Export failed: " + (e as any).message);
+    } finally {
+      setDownloading(null);
     }
   };
 
@@ -58,24 +94,24 @@ export default function LandingPage() {
           </Link>
 
           {/* Nav Links */}
-          <div className="hidden md:flex items-center gap-7 text-xs font-semibold text-foreground-muted">
+          <div className="hidden md:flex items-center gap-6 text-xs font-semibold text-foreground-muted">
             <button
               onClick={() => scrollToSection("overview")}
               className="hover:text-foreground transition-colors"
             >
-              Platform Overview
+              Overview
             </button>
             <button
               onClick={() => scrollToSection("interactive-demo")}
               className="hover:text-foreground transition-colors"
             >
-              How It Cleans Data
+              Interactive Cleaning
             </button>
             <button
               onClick={() => scrollToSection("capabilities")}
               className="hover:text-foreground transition-colors"
             >
-              Core Capabilities
+              Capabilities
             </button>
             <button
               onClick={() => scrollToSection("pipeline")}
@@ -84,15 +120,49 @@ export default function LandingPage() {
               5-Stage Pipeline
             </button>
             <button
+              onClick={() => scrollToSection("how-it-works-and-downloads")}
+              className="hover:text-brand-600 dark:hover:text-brand-400 font-bold transition-colors text-foreground flex items-center gap-1"
+            >
+              <span>User Guide & Downloads</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
+            </button>
+            <button
               onClick={() => scrollToSection("faq")}
               className="hover:text-foreground transition-colors"
             >
-              User Guide & FAQ
+              FAQ
             </button>
           </div>
 
           {/* Theme & CTA Button */}
           <div className="flex items-center gap-3">
+            {/* Global Jurisdiction Selector */}
+            <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-surface text-[11px] font-semibold text-foreground shadow-subtle">
+              <Globe2 className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400 flex-shrink-0" />
+              <select
+                value={selectedJurisdiction}
+                onChange={(e) => setSelectedJurisdiction(e.target.value)}
+                className="bg-transparent text-foreground font-semibold focus:outline-none cursor-pointer"
+              >
+                <option value="Global">🌐 Global Standards</option>
+                <option value="Australia">🇦🇺 Australia (AHPRA / RACGP)</option>
+                <option value="USA">🇺🇸 United States (NPI / CMS)</option>
+                <option value="India">🇮🇳 India (NMC / ABDM)</option>
+                <option value="Nepal">🇳🇵 Nepal (NMC / MoHP)</option>
+                <option value="International">🇷🇺 International (WHO ICD-11)</option>
+              </select>
+            </div>
+
+            {/* Quick Guide Trigger */}
+            <button
+              onClick={() => setGuideModalOpen(true)}
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-border text-foreground hover:bg-surface-muted transition-colors"
+              title="Open Complete Operational Guide & Download Specs"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />
+              <span>Guide & Downloads</span>
+            </button>
+
             <button
               onClick={toggleTheme}
               className="p-2 rounded-lg border border-border text-foreground-muted hover:text-foreground hover:bg-surface-muted transition-colors"
@@ -102,7 +172,7 @@ export default function LandingPage() {
             </button>
 
             <Link
-              href="/login"
+              href="/dashboard"
               className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-brand-700 hover:bg-brand-600 text-white transition-all shadow-subtle hover:shadow-card"
             >
               <span>Launch Platform</span>
@@ -572,6 +642,340 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── SECTION: HOW IT WORKS, HOW TO USE IT & WHAT TO DOWNLOAD ────── */}
+      <section id="how-it-works-and-downloads" className="py-20 px-6 max-w-7xl mx-auto border-b border-border">
+        <div className="text-center max-w-3xl mx-auto mb-12">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-brand-50 dark:bg-brand-950 text-brand-800 dark:text-brand-300 border border-brand-200 dark:border-brand-800 mb-3">
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>Complete Operational Manual</span>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+            How It Works, How to Use It & What to Download
+          </h2>
+          <p className="text-xs sm:text-sm text-foreground-muted mt-2 leading-relaxed">
+            CareData AI is an enterprise healthcare provider intelligence engine. Here is a clear, transparent breakdown
+            of the underlying architecture, the operational workflow for healthcare analysts, and the business purpose of every exportable file.
+          </p>
+
+          {/* Sub-tab Switcher */}
+          <div className="mt-8 inline-flex p-1 rounded-xl bg-surface-muted border border-border">
+            <button
+              onClick={() => setGuideSubTab("how-it-works")}
+              className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all flex items-center gap-2 ${
+                guideSubTab === "how-it-works"
+                  ? "bg-surface text-foreground shadow-subtle border border-border"
+                  : "text-foreground-muted hover:text-foreground"
+              }`}
+            >
+              <Activity className="w-3.5 h-3.5" />
+              <span>1. How It Works</span>
+            </button>
+            <button
+              onClick={() => setGuideSubTab("how-to-use")}
+              className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all flex items-center gap-2 ${
+                guideSubTab === "how-to-use"
+                  ? "bg-surface text-foreground shadow-subtle border border-border"
+                  : "text-foreground-muted hover:text-foreground"
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>2. How to Use It</span>
+            </button>
+            <button
+              onClick={() => setGuideSubTab("downloads")}
+              className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all flex items-center gap-2 ${
+                guideSubTab === "downloads"
+                  ? "bg-brand-700 text-white shadow-subtle"
+                  : "text-foreground-muted hover:text-foreground"
+              }`}
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>3. What to Download & For What</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Tab 1: How It Works */}
+        {guideSubTab === "how-it-works" && (
+          <div className="space-y-8 animate-in fade-in duration-300">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="p-6 rounded-2xl bg-surface border border-border shadow-card flex flex-col justify-between">
+                <div>
+                  <div className="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 flex items-center justify-center mb-4">
+                    <Database className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-base font-bold text-foreground">1. Multi-Source Ingestion</h3>
+                  <p className="text-xs text-foreground-muted mt-2 leading-relaxed">
+                    Healthcare provider rosters arrive in inconsistent spreadsheets, hospital extracts, or clinic databases.
+                    CareData AI ingests messy CSVs or Excel workbooks, dynamically maps column names, and preserves raw records in immutable storage.
+                  </p>
+                </div>
+                <div className="pt-4 mt-4 border-t border-border flex items-center justify-between text-[11px] text-foreground-muted font-mono">
+                  <span>Input Formats:</span>
+                  <span className="font-semibold text-foreground">.XLSX, .CSV, Tabular EHR</span>
+                </div>
+              </div>
+
+              <div className="p-6 rounded-2xl bg-surface border border-border shadow-card flex flex-col justify-between">
+                <div>
+                  <div className="w-10 h-10 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-400 border border-brand-500/20 flex items-center justify-center mb-4">
+                    <ShieldCheck className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-base font-bold text-foreground">2. Deterministic Cleaning</h3>
+                  <p className="text-xs text-foreground-muted mt-2 leading-relaxed">
+                    Standardizes phone numbers into E.164 and callable formats (+61 Australia, +1 USA, +91 India, +977 Nepal).
+                    Parses doctor titles (Dr., A/Prof, Prof.), separates messy multi-line street addresses, and corrects geographic suburbs.
+                  </p>
+                </div>
+                <div className="pt-4 mt-4 border-t border-border flex items-center justify-between text-[11px] text-foreground-muted font-mono">
+                  <span>Phone Standards:</span>
+                  <span className="font-semibold text-brand-600 dark:text-brand-400">E.164 Strict Regex</span>
+                </div>
+              </div>
+
+              <div className="p-6 rounded-2xl bg-surface border border-border shadow-card flex flex-col justify-between">
+                <div>
+                  <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 flex items-center justify-center mb-4">
+                    <Sparkles className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-base font-bold text-foreground">3. AI Taxonomy & Entity Graph</h3>
+                  <p className="text-xs text-foreground-muted mt-2 leading-relaxed">
+                    High-speed Groq LLM harmonizes ambiguous clinical descriptions into statutory specialties (RACGP, CMS NPI, NMC).
+                    Fuzzy token similarity algorithms detect when the same doctor is listed multiple times across different regional clinics.
+                  </p>
+                </div>
+                <div className="pt-4 mt-4 border-t border-border flex items-center justify-between text-[11px] text-foreground-muted font-mono">
+                  <span>Taxonomy Matching:</span>
+                  <span className="font-semibold text-purple-600 dark:text-purple-400">Groq LLM + Rules</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Global Regulatory Standards Strip */}
+            <div className="p-5 rounded-2xl bg-surface-muted border border-border flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <Globe2 className="w-6 h-6 text-brand-600 dark:text-brand-400 flex-shrink-0" />
+                <div>
+                  <h4 className="text-xs font-bold text-foreground">Multi-Jurisdiction Healthcare Directory Support</h4>
+                  <p className="text-[11px] text-foreground-muted">
+                    Engineered to support national healthcare directory structures and identifier formats worldwide.
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2 text-xs">
+                <span className="px-2.5 py-1 rounded-md bg-surface border border-border font-mono text-[10px] text-foreground">
+                  🇦🇺 AHPRA / RACGP
+                </span>
+                <span className="px-2.5 py-1 rounded-md bg-surface border border-border font-mono text-[10px] text-foreground">
+                  🇺🇸 CMS NPI (10-Digit)
+                </span>
+                <span className="px-2.5 py-1 rounded-md bg-surface border border-border font-mono text-[10px] text-foreground">
+                  🇮🇳 NMC / ABDM HPR
+                </span>
+                <span className="px-2.5 py-1 rounded-md bg-surface border border-border font-mono text-[10px] text-foreground">
+                  🇳🇵 Nepal NMC / MoHP
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 2: How to Use It */}
+        {guideSubTab === "how-to-use" && (
+          <div className="max-w-4xl mx-auto space-y-4 animate-in fade-in duration-300 text-xs">
+            <div className="p-5 rounded-2xl bg-surface border border-border shadow-card flex items-start gap-4">
+              <span className="w-8 h-8 rounded-xl bg-brand-500/10 text-brand-700 dark:text-brand-300 font-mono font-bold text-sm flex items-center justify-center flex-shrink-0">
+                1
+              </span>
+              <div>
+                <h4 className="font-bold text-foreground text-sm">Upload Provider Rosters or Select Demo Cohort</h4>
+                <p className="text-foreground-muted mt-1 leading-relaxed">
+                  Go to <strong>Upload Data</strong>. You can upload an XLSX/CSV file or work with the pre-seeded pilot cohort (150 Sydney GPs).
+                  The pre-flight mapper confirms all required clinical fields before processing.
+                </p>
+              </div>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-surface border border-border shadow-card flex items-start gap-4">
+              <span className="w-8 h-8 rounded-xl bg-brand-500/10 text-brand-700 dark:text-brand-300 font-mono font-bold text-sm flex items-center justify-center flex-shrink-0">
+                2
+              </span>
+              <div>
+                <h4 className="font-bold text-foreground text-sm">Standardize & Clean Formatting Discrepancies</h4>
+                <p className="text-foreground-muted mt-1 leading-relaxed">
+                  Go to <strong>Data Cleaning</strong>. The dashboard automatically flags telephone formatting issues, casing irregularities,
+                  and missing websites. You can approve individual suggestions or batch-accept all deterministic corrections.
+                </p>
+              </div>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-surface border border-border shadow-card flex items-start gap-4">
+              <span className="w-8 h-8 rounded-xl bg-brand-500/10 text-brand-700 dark:text-brand-300 font-mono font-bold text-sm flex items-center justify-center flex-shrink-0">
+                3
+              </span>
+              <div>
+                <h4 className="font-bold text-foreground text-sm">Verify AI Clinical Taxonomy Classifications</h4>
+                <p className="text-foreground-muted mt-1 leading-relaxed">
+                  Go to <strong>AI Classification</strong>. Inspect how messy provider bio descriptions were mapped to official categories.
+                  High-confidence matches (&gt;88%) are highlighted in emerald; you can adjust classifications with 1 click.
+                </p>
+              </div>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-surface border border-border shadow-card flex items-start gap-4">
+              <span className="w-8 h-8 rounded-xl bg-brand-500/10 text-brand-700 dark:text-brand-300 font-mono font-bold text-sm flex items-center justify-center flex-shrink-0">
+                4
+              </span>
+              <div>
+                <h4 className="font-bold text-foreground text-sm">Inspect Practitioner Dossiers & Resolve Duplicates</h4>
+                <p className="text-foreground-muted mt-1 leading-relaxed">
+                  Open <strong>Data Explorer</strong> to search doctors by name, clinic, or specialty.
+                  Click any doctor row to view their complete dossier drawer: original vs accepted values, clinic affiliations, and audit trail.
+                </p>
+              </div>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-surface border border-border shadow-card flex items-start gap-4">
+              <span className="w-8 h-8 rounded-xl bg-brand-500/10 text-brand-700 dark:text-brand-300 font-mono font-bold text-sm flex items-center justify-center flex-shrink-0">
+                5
+              </span>
+              <div>
+                <h4 className="font-bold text-foreground text-sm">Export Formatted Reports for Enterprise Systems</h4>
+                <p className="text-foreground-muted mt-1 leading-relaxed">
+                  Visit <strong>Reports & Export</strong> to download formatted Excel workbooks or CSV files for clinical EHRs,
+                  regulatory compliance packages, or credentialing audits.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 3: What to Download & For What Purpose */}
+        {guideSubTab === "downloads" && (
+          <div className="space-y-4 animate-in fade-in duration-300">
+            <div className="p-4 rounded-xl bg-brand-500/10 border border-brand-500/20 text-xs">
+              <span className="font-bold text-foreground block">
+                Official Export Catalog: 5 Specialized Enterprise Deliverables
+              </span>
+              <p className="text-foreground-muted mt-1 leading-relaxed">
+                CareData AI does not produce raw generic data dumps. It compiles 5 purpose-built, audit-ready deliverables
+                tailored to hospital administrators, compliance officers, and analytics engineers.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              {/* File 1 */}
+              <div className="p-5 rounded-2xl bg-surface border border-border shadow-card flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                      FILE 01 • SPREADSHEET (.XLSX)
+                    </span>
+                    <FileSpreadsheet className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <h4 className="text-sm font-bold text-foreground">Cleaned Healthcare Provider Roster</h4>
+                  <p className="text-foreground-muted text-[11px] mt-2 leading-relaxed">
+                    <strong>Business Purpose:</strong> Production roster ingestion into Hospital EHRs (Epic, Cerner), patient-facing search directories, and telehealth booking systems.
+                  </p>
+                  <p className="text-foreground-muted text-[11px] mt-2 leading-relaxed">
+                    <strong>Contents:</strong> Fully standardized doctor names, E.164 phone numbers, valid physical addresses, and verified RACGP/CMS specialty categories.
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleDownload("cleaned", "cleaned_provider_dataset.xlsx")}
+                  disabled={downloading === "cleaned"}
+                  className="mt-4 w-full py-2 px-3 rounded-xl bg-brand-700 hover:bg-brand-600 text-white font-semibold text-xs flex items-center justify-center gap-2 transition-colors"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>{downloading === "cleaned" ? "Compiling..." : "Download Cleaned Roster (Excel)"}</span>
+                </button>
+              </div>
+
+              {/* File 2 */}
+              <div className="p-5 rounded-2xl bg-surface border border-border shadow-card flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20">
+                      FILE 02 • AUDIT TRAIL (.CSV)
+                    </span>
+                    <ShieldCheck className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+                  </div>
+                  <h4 className="text-sm font-bold text-foreground">Data Quality & Compliance Audit Log</h4>
+                  <p className="text-foreground-muted text-[11px] mt-2 leading-relaxed">
+                    <strong>Business Purpose:</strong> Legal compliance, health insurance credentialing audits, and Primary Health Network (PHN) data governance verification.
+                  </p>
+                  <p className="text-foreground-muted text-[11px] mt-2 leading-relaxed">
+                    <strong>Contents:</strong> Complete record of every raw uploaded value, the exact transformation rule applied, analyst sign-off timestamp, and override rationale.
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleDownload("quality", "data_quality_issues.csv")}
+                  disabled={downloading === "quality"}
+                  className="mt-4 w-full py-2 px-3 rounded-xl border border-border bg-surface-muted hover:bg-surface text-foreground font-semibold text-xs flex items-center justify-center gap-2 transition-colors"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>{downloading === "quality" ? "Compiling..." : "Download Audit Log (CSV)"}</span>
+                </button>
+              </div>
+
+              {/* File 3 */}
+              <div className="p-5 rounded-2xl bg-surface border border-border shadow-card flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                      FILE 03 • ENTITY REPORT (.CSV)
+                    </span>
+                    <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                  </div>
+                  <h4 className="text-sm font-bold text-foreground">Duplicate Candidate & Entity Resolution Queue</h4>
+                  <p className="text-foreground-muted text-[11px] mt-2 leading-relaxed">
+                    <strong>Business Purpose:</strong> Revenue cycle management, provider directory deduplication, and eliminating phantom doctor billing.
+                  </p>
+                  <p className="text-foreground-muted text-[11px] mt-2 leading-relaxed">
+                    <strong>Contents:</strong> Pairwise fuzzy similarity scores, shared clinic contact points, address overlaps, and operational resolution states.
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleDownload("duplicates", "duplicate_candidates.csv")}
+                  disabled={downloading === "duplicates"}
+                  className="mt-4 w-full py-2 px-3 rounded-xl border border-border bg-surface-muted hover:bg-surface text-foreground font-semibold text-xs flex items-center justify-center gap-2 transition-colors"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>{downloading === "duplicates" ? "Compiling..." : "Download Duplicates Report (CSV)"}</span>
+                </button>
+              </div>
+
+              {/* File 4 */}
+              <div className="p-5 rounded-2xl bg-surface border border-border shadow-card flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
+                      FILE 04 • TAXONOMY MATRIX (.XLSX)
+                    </span>
+                    <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <h4 className="text-sm font-bold text-foreground">AI Specialty Taxonomy Breakdown Matrix</h4>
+                  <p className="text-foreground-muted text-[11px] mt-2 leading-relaxed">
+                    <strong>Business Purpose:</strong> Clinical workforce capacity planning, regional specialty referral balancing, and health authority resource allocation.
+                  </p>
+                  <p className="text-foreground-muted text-[11px] mt-2 leading-relaxed">
+                    <strong>Contents:</strong> Doctor clinical biographies harmonized into official primary care categories with AI confidence ratings and rationale notes.
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleDownload("specialties", "ai_specialty_classifications.xlsx")}
+                  disabled={downloading === "specialties"}
+                  className="mt-4 w-full py-2 px-3 rounded-xl border border-border bg-surface-muted hover:bg-surface text-foreground font-semibold text-xs flex items-center justify-center gap-2 transition-colors"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>{downloading === "specialties" ? "Compiling..." : "Download Taxonomy Matrix (Excel)"}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
+
       {/* ── USER GUIDE & FAQ SECTION ─────────────────────────── */}
       <section id="faq" className="py-16 px-6 max-w-4xl mx-auto border-b border-border">
         <div className="text-center mb-10">
@@ -640,10 +1044,16 @@ export default function LandingPage() {
           </div>
         </div>
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px]">
-          <span>© 2026 CareData AI Platform. All rights reserved. Built for Australian Primary Care Intelligence.</span>
-          <span className="font-mono text-brand-600 dark:text-brand-400">Sydney GP Pilot • 150 Practitioners</span>
+          <span>© 2026 CareData AI Platform. All rights reserved. Built for Global Primary Care Intelligence.</span>
+          <span className="font-mono text-brand-600 dark:text-brand-400">Global Provider Directory • Multi-Jurisdiction Engine</span>
         </div>
       </footer>
+
+      {/* Platform Guide & Download Specs Modal */}
+      <PlatformGuideModal
+        isOpen={guideModalOpen}
+        onClose={() => setGuideModalOpen(false)}
+      />
     </div>
   );
 }

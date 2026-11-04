@@ -90,9 +90,12 @@ def clean_doctor_name(raw_name: str) -> Tuple[str, List[str]]:
 
 def clean_phone_number(raw_phone: str) -> Tuple[str, List[str], bool]:
     """
-    Standardizes Australian telephone formats:
-    - Landline: (02) XXXX XXXX
-    - Mobile: 04XX XXX XXX
+    Standardizes Multi-Jurisdiction telephone formats:
+    - Australia: (02) XXXX XXXX or 04XX XXX XXX or +61 ...
+    - USA: +1 (XXX) XXX-XXXX
+    - India: +91 XXXXX XXXXX
+    - Nepal: +977 98XX XXXXXX
+    - International (e.g. +7, +44, etc.): Standardized E.164
     Returns (cleaned_phone, changes, is_valid)
     """
     raw = clean_text(raw_phone)
@@ -101,7 +104,26 @@ def clean_phone_number(raw_phone: str) -> Tuple[str, List[str], bool]:
         
     digits = re.sub(r'\D', '', raw)
     
-    # Remove international prefix +61
+    # Check international prefixes
+    # 1. India (+91)
+    if (raw.startswith("+91") or digits.startswith("91")) and len(digits) == 12:
+        formatted = f"+91 {digits[2:7]} {digits[7:]}"
+        changes = [f"Formatted Indian mobile to national standard {formatted}"] if formatted != raw else []
+        return formatted, changes, True
+        
+    # 2. Nepal (+977)
+    if (raw.startswith("+977") or digits.startswith("977")) and len(digits) == 13:
+        formatted = f"+977 {digits[3:5]} {digits[5:]}"
+        changes = [f"Formatted Nepal mobile to national standard {formatted}"] if formatted != raw else []
+        return formatted, changes, True
+
+    # 3. USA / Canada (+1)
+    if (raw.startswith("+1") or digits.startswith("1")) and len(digits) == 11:
+        formatted = f"+1 ({digits[1:4]}) {digits[4:7]}-{digits[7:]}"
+        changes = [f"Formatted US/Canada number to standard {formatted}"] if formatted != raw else []
+        return formatted, changes, True
+
+    # 4. Australia (+61)
     if digits.startswith("61") and len(digits) in (10, 11):
         digits = "0" + digits[2:]
         
@@ -118,10 +140,18 @@ def clean_phone_number(raw_phone: str) -> Tuple[str, List[str], bool]:
             formatted = f"{digits[:4]} {digits[4:7]} {digits[7:]}"
             changes = [f"Formatted mobile to Australian standard {formatted}"] if formatted != raw else []
             return formatted, changes, True
+        elif digits.startswith("9") or digits.startswith("8") or digits.startswith("7"):
+            # 10-digit Indian standard local without prefix
+            formatted = f"+91 {digits[:5]} {digits[5:]}"
+            return formatted, [f"Standardized 10-digit mobile to Indian format {formatted}"], True
         else:
             formatted = f"({digits[:2]}) {digits[2:6]} {digits[6:]}"
             return formatted, [f"Standardized phone format to {formatted}"], True
             
+    # International generic if starts with +
+    if raw.startswith("+") and len(digits) >= 10:
+        return raw, ["Preserved valid international E.164 phone number"], True
+
     # Unrecognized length or invalid
     return raw, ["Phone number contains non-standard digit length"], False
 

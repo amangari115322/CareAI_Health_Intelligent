@@ -1,37 +1,44 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Sun,
   Moon,
   RotateCcw,
+  Search,
+  Bell,
+  Globe2,
+  BookOpen,
+  User,
   Activity,
-  Layers,
-  Sparkles,
-  CheckCircle2,
 } from "lucide-react";
 import { api, ActiveJob } from "../lib/caredataApi";
 import { ProcessingTrackerModal } from "./ProcessingTrackerModal";
+import { PlatformGuideModal } from "./PlatformGuideModal";
 
 export const TopBar: React.FC = () => {
   const pathname = usePathname();
-  const [theme, setTheme] = useState<"dark" | "light">("light");
+  const router = useRouter();
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [searchQuery, setSearchQuery] = useState("");
   const [activeJob, setActiveJob] = useState<ActiveJob | null>(null);
   const [trackerOpen, setTrackerOpen] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
+  const [jurisdiction, setJurisdiction] = useState<string>("Global");
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
   const [resetting, setResetting] = useState(false);
 
   useEffect(() => {
     const saved = typeof window !== "undefined" ? localStorage.getItem("caredata_theme") : null;
-    if (saved === "dark") {
-      document.documentElement.classList.remove("light");
+    const initialTheme = saved === "light" ? "light" : "dark";
+    setTheme(initialTheme);
+    if (initialTheme === "dark") {
       document.documentElement.classList.add("dark");
-      setTheme("dark");
+      document.documentElement.classList.remove("light");
     } else {
-      document.documentElement.classList.remove("dark");
       document.documentElement.classList.add("light");
-      setTheme("light");
+      document.documentElement.classList.remove("dark");
     }
 
     const loadJob = async () => {
@@ -59,6 +66,13 @@ export const TopBar: React.FC = () => {
     }
   };
 
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/explorer?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
   const handleResetDemo = async () => {
     setResetting(true);
     try {
@@ -76,88 +90,101 @@ export const TopBar: React.FC = () => {
     return null;
   }
 
-  const getPageInfo = (path: string) => {
-    switch (path) {
-      case "/dashboard":
-        return { title: "Executive Dashboard", subtitle: "Project overview, key metrics, and processing status" };
-      case "/upload":
-        return { title: "Upload Data", subtitle: "Import CSV/XLSX provider rosters, map columns, and execute pipeline" };
-      case "/cleaning":
-        return { title: "Data Cleaning & Validation", subtitle: "Review formatting issues, missing values, and duplicate candidates" };
-      case "/classification":
-        return { title: "AI Specialty Classification", subtitle: "Standardize provider clinical descriptions using Australian GP taxonomy" };
-      case "/explorer":
-        return { title: "Data Explorer", subtitle: "Search, filter, and inspect detailed practitioner dossiers" };
-      case "/analytics":
-        return { title: "Reports & Export", subtitle: "Export cleaned provider datasets, quality issues, and audit trails" };
-      case "/collection":
-        return { title: "Data Collection", subtitle: "Manage statutory registries and future public data connectors" };
-      case "/settings":
-        return { title: "Platform Settings", subtitle: "Configure validation rules, review thresholds, and taxonomy" };
-      default:
-        return { title: "Workspace", subtitle: "Sydney GP Research Pilot" };
-    }
-  };
-
-  const pageInfo = getPageInfo(pathname);
-
   return (
     <>
-      <header className="sticky top-0 z-20 flex items-center justify-between h-14 px-6 border-b border-border bg-surface/90 backdrop-blur-md">
-        {/* Left: Page Title */}
-        <div className="flex items-center gap-3">
-          <div>
-            <h1 className="text-sm font-semibold text-foreground tracking-tight leading-none">
-              {pageInfo.title}
-            </h1>
-            <span className="text-[11px] text-foreground-muted hidden sm:inline-block leading-none mt-1">
-              {pageInfo.subtitle}
-            </span>
-          </div>
-        </div>
+      <header className="sticky top-0 z-20 flex items-center justify-between h-16 px-6 md:px-8 border-b border-border bg-surface/95 backdrop-blur-md">
+        {/* Left/Center: Search Bar matching Screenshot */}
+        <form onSubmit={handleSearchSubmit} className="relative flex-1 max-w-md mr-4">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-muted pointer-events-none" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search records, clinics or specialties..."
+            className="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-border bg-surface-muted/60 text-foreground placeholder:text-foreground-muted/70 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all shadow-sm"
+          />
+        </form>
 
-        {/* Right: Actions */}
-        <div className="flex items-center gap-2.5">
-          {/* Dataset & Pipeline Status Pill */}
+        {/* Right: Actions, Global Selector, Theme Switch, Notification, User Profile */}
+        <div className="flex items-center gap-3">
+          {/* Global Jurisdiction Selector */}
+          <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-surface text-xs font-medium text-foreground shadow-sm">
+            <Globe2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+            <select
+              value={jurisdiction}
+              onChange={(e) => setJurisdiction(e.target.value)}
+              className="bg-transparent text-foreground text-xs font-medium focus:outline-none cursor-pointer"
+              title="Select Regulatory Healthcare Jurisdiction"
+            >
+              <option value="Global" className="dark:bg-slate-900">🌐 Global Standards</option>
+              <option value="Australia" className="dark:bg-slate-900">🇦🇺 Australia (AHPRA)</option>
+              <option value="USA" className="dark:bg-slate-900">🇺🇸 United States (NPI)</option>
+              <option value="India" className="dark:bg-slate-900">🇮🇳 India (NMC / ABDM)</option>
+              <option value="Nepal" className="dark:bg-slate-900">🇳🇵 Nepal (NMC)</option>
+              <option value="International" className="dark:bg-slate-900">🇷🇺 International (WHO)</option>
+            </select>
+          </div>
+
+          {/* Guide & Downloads Button */}
+          <button
+            onClick={() => setGuideOpen(true)}
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-xl border border-border text-foreground hover:bg-surface-muted transition-colors shadow-sm"
+            title="Open How it Works, How to Use It & What to Download"
+          >
+            <BookOpen className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <span>Guide & Downloads</span>
+          </button>
+
+          {/* Pipeline Tracker Quick Pill */}
           <button
             onClick={() => setTrackerOpen(true)}
-            className="flex items-center gap-2 px-3 py-1.5 text-xs rounded-lg border border-border bg-surface hover:bg-surface-muted transition-colors text-foreground shadow-subtle"
-            title="Click to view pipeline processing status"
+            className="hidden md:flex items-center gap-2 px-3 py-1.5 text-xs rounded-xl border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/15 transition-colors text-foreground shadow-sm"
+            title="View Pipeline Status"
           >
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-semibold text-xs text-foreground">Pipeline Status</span>
-            <span className="text-[11px] text-foreground-muted hidden sm:inline">
-              (150 GPs Ready)
-            </span>
+            <span className="font-semibold text-foreground">Pipeline</span>
           </button>
 
-          {/* Reset Demo button */}
-          <button
-            onClick={() => setResetConfirmOpen(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-md border border-border text-foreground-muted hover:text-foreground hover:bg-surface-muted transition-colors"
-            title="Reset dataset to default 150 Sydney GPs"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline text-[11px]">Reset Demo</span>
-          </button>
-
-          {/* Theme Toggle */}
-          <button
+          {/* Theme Toggle Pill Switch matching screenshot */}
+          <div
             onClick={toggleTheme}
-            className="p-1.5 rounded-md border border-border text-foreground-muted hover:text-foreground hover:bg-surface-muted transition-colors"
+            className="flex items-center p-1 rounded-full border border-border bg-surface-muted cursor-pointer hover:border-emerald-500/40 transition-all select-none"
             title={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
           >
-            {theme === "dark" ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-600" />}
+            <div
+              className={`flex items-center justify-center w-6 h-6 rounded-full transition-all duration-200 ${
+                theme === "dark" ? "bg-slate-800 text-amber-400 shadow-sm" : "text-foreground-muted"
+              }`}
+            >
+              <Moon className="w-3.5 h-3.5" />
+            </div>
+            <div
+              className={`flex items-center justify-center w-6 h-6 rounded-full transition-all duration-200 ${
+                theme === "light" ? "bg-white text-amber-500 shadow-sm" : "text-foreground-muted"
+              }`}
+            >
+              <Sun className="w-3.5 h-3.5" />
+            </div>
+          </div>
+
+          {/* Notification Bell */}
+          <button
+            onClick={() => router.push("/cleaning")}
+            className="relative p-2 rounded-xl border border-border text-foreground hover:bg-surface-muted transition-colors"
+            title="Notifications & Review Alerts"
+          >
+            <Bell className="w-4 h-4 text-foreground-muted" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-surface" />
           </button>
 
-          {/* User Profile */}
-          <div className="flex items-center gap-2 pl-2 border-l border-border">
-            <div className="w-7 h-7 rounded-full bg-brand-700 text-white flex items-center justify-center text-xs font-semibold">
-              CD
+          {/* User Profile Pill matching screenshot */}
+          <div className="flex items-center gap-2.5 pl-2 border-l border-border">
+            <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-semibold text-xs shadow-sm ring-2 ring-emerald-500/20">
+              <User className="w-4 h-4" />
             </div>
-            <div className="hidden lg:flex flex-col text-left">
-              <span className="text-xs font-medium leading-none text-foreground">Analyst Session</span>
-              <span className="text-[10px] text-foreground-muted leading-none mt-0.5">Sydney Research</span>
+            <div className="hidden sm:flex flex-col text-left">
+              <span className="text-xs font-semibold leading-tight text-foreground">Demo User</span>
+              <span className="text-[10px] text-foreground-muted leading-tight">Demo Account</span>
             </div>
           </div>
         </div>
@@ -170,28 +197,34 @@ export const TopBar: React.FC = () => {
         job={activeJob}
       />
 
+      {/* Platform Guide & Downloads Modal */}
+      <PlatformGuideModal
+        isOpen={guideOpen}
+        onClose={() => setGuideOpen(false)}
+      />
+
       {/* Reset Confirmation Modal */}
       {resetConfirmOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
           <div className="w-full max-w-sm bg-surface border border-border rounded-xl p-5 shadow-float text-foreground">
             <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
               <RotateCcw className="w-4 h-4 text-amber-500" />
               Reset Demo Dataset?
             </h3>
             <p className="text-xs text-foreground-muted mt-2 leading-relaxed">
-              This will re-initialize the workspace with the clean pilot dataset of 150 Sydney General Practitioners, restoring all original values, detected duplicates, and standard cleaning issues.
+              This will re-initialize the workspace with the verified practitioner cohort.
             </p>
             <div className="flex items-center justify-end gap-2.5 mt-5">
               <button
                 onClick={() => setResetConfirmOpen(false)}
-                className="px-3 py-1.5 text-xs font-medium rounded-md border border-border hover:bg-surface-muted transition-colors"
+                className="px-3 py-1.5 text-xs font-medium rounded-lg border border-border hover:bg-surface-muted transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleResetDemo}
                 disabled={resetting}
-                className="px-3.5 py-1.5 text-xs font-semibold rounded-md bg-brand-700 hover:bg-brand-600 text-white transition-colors"
+                className="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition-colors"
               >
                 {resetting ? "Resetting..." : "Confirm & Reset"}
               </button>
