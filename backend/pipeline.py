@@ -54,14 +54,15 @@ def clean_doctor_name(raw_name: str) -> Tuple[str, List[str]]:
     
     # Check title prefix
     title = "Dr."
-    if re.search(r'\b(associate professor|a/prof\.?)\b', cleaned, re.IGNORECASE):
+    if re.search(r'\b(associate professor|a/prof)\b\.?', cleaned, re.IGNORECASE):
         title = "A/Prof"
-        cleaned = re.sub(r'\b(associate professor|a/prof\.?)\b', '', cleaned, flags=re.IGNORECASE).strip()
-    elif re.search(r'\b(prof\.?|professor)\b', cleaned, re.IGNORECASE):
+        cleaned = re.sub(r'\b(associate professor|a/prof)\b\.?\s*', '', cleaned, flags=re.IGNORECASE).strip()
+    elif re.search(r'\b(prof|professor)\b\.?', cleaned, re.IGNORECASE):
         title = "Prof."
-        cleaned = re.sub(r'\b(prof\.?|professor)\b', '', cleaned, flags=re.IGNORECASE).strip()
-    elif re.search(r'\b(dr\.?|doctor)\b', cleaned, re.IGNORECASE):
-        cleaned = re.sub(r'\b(dr\.?|doctor)\b', '', cleaned, flags=re.IGNORECASE).strip()
+        cleaned = re.sub(r'\b(prof|professor)\b\.?\s*', '', cleaned, flags=re.IGNORECASE).strip()
+    elif re.search(r'\b(dr|doctor)\b\.?', cleaned, re.IGNORECASE):
+        title = "Dr."
+        cleaned = re.sub(r'\b(dr|doctor)\b\.?\s*', '', cleaned, flags=re.IGNORECASE).strip()
     
     # Title-case remaining name
     # Handle names like O'Connor, MacLeod

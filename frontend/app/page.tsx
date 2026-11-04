@@ -27,6 +27,7 @@ import {
   BookOpen,
   Download,
   AlertCircle,
+  Menu,
 } from "lucide-react";
 import { CareDataLogo } from "../components/CareDataLogo";
 import { PlatformGuideModal } from "../components/PlatformGuideModal";
@@ -40,6 +41,7 @@ export default function LandingPage() {
   const [selectedJurisdiction, setSelectedJurisdiction] = useState("Global");
   const [guideSubTab, setGuideSubTab] = useState<"how-it-works" | "how-to-use" | "downloads">("how-it-works");
   const [downloading, setDownloading] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const saved = typeof window !== "undefined" ? localStorage.getItem("caredata_theme") : null;
@@ -85,60 +87,60 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground selection:bg-brand-500/20">
+    <div className="min-h-screen bg-background text-foreground selection:bg-emerald-500/20">
       {/* ── TOP NAVIGATION ───────────────────────────────────── */}
-      <nav className="sticky top-0 z-40 border-b border-border bg-surface/90 backdrop-blur-md">
+      <nav className="sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center">
+          <Link href="/" className="flex items-center flex-shrink-0">
             <CareDataLogo size="md" />
           </Link>
 
-          {/* Nav Links */}
-          <div className="hidden md:flex items-center gap-6 text-xs font-semibold text-foreground-muted">
+          {/* Desktop Nav Links with Clean Pill Hover States */}
+          <div className="hidden lg:flex items-center gap-1 text-xs font-medium text-foreground-muted">
             <button
               onClick={() => scrollToSection("overview")}
-              className="hover:text-foreground transition-colors"
+              className="px-2.5 py-1.5 rounded-lg hover:bg-surface-muted hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
             >
               Overview
             </button>
             <button
               onClick={() => scrollToSection("interactive-demo")}
-              className="hover:text-foreground transition-colors"
+              className="px-2.5 py-1.5 rounded-lg hover:bg-surface-muted hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
             >
               Interactive Cleaning
             </button>
             <button
               onClick={() => scrollToSection("capabilities")}
-              className="hover:text-foreground transition-colors"
+              className="px-2.5 py-1.5 rounded-lg hover:bg-surface-muted hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
             >
               Capabilities
             </button>
             <button
               onClick={() => scrollToSection("pipeline")}
-              className="hover:text-foreground transition-colors"
+              className="px-2.5 py-1.5 rounded-lg hover:bg-surface-muted hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
             >
               5-Stage Pipeline
             </button>
             <button
               onClick={() => scrollToSection("how-it-works-and-downloads")}
-              className="hover:text-brand-600 dark:hover:text-brand-400 font-bold transition-colors text-foreground flex items-center gap-1"
+              className="px-2.5 py-1.5 rounded-lg hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 font-semibold transition-colors text-foreground flex items-center gap-1.5 border border-transparent hover:border-emerald-500/20"
             >
-              <span>User Guide & Downloads</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
+              <span>User Guide</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             </button>
             <button
               onClick={() => scrollToSection("faq")}
-              className="hover:text-foreground transition-colors"
+              className="px-2.5 py-1.5 rounded-lg hover:bg-surface-muted hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
             >
               FAQ
             </button>
           </div>
 
-          {/* Theme & CTA Button */}
-          <div className="flex items-center gap-3">
+          {/* Theme, Jurisdiction & CTA Buttons */}
+          <div className="flex items-center gap-2 flex-shrink-0">
             {/* Global Jurisdiction Selector (Custom High-Contrast Dropdown) */}
-            <div className="hidden lg:block">
+            <div className="hidden xl:block">
               <GlobalJurisdictionDropdown
                 value={selectedJurisdiction}
                 onChange={setSelectedJurisdiction}
@@ -148,73 +150,157 @@ export default function LandingPage() {
             {/* Quick Guide Trigger */}
             <button
               onClick={() => setGuideModalOpen(true)}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-border text-foreground hover:bg-surface-muted transition-colors"
+              className="hidden 2xl:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl border border-border text-foreground hover:bg-surface-muted transition-colors shadow-sm"
               title="Open Complete Operational Guide & Download Specs"
             >
-              <BookOpen className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />
+              <BookOpen className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
               <span>Guide & Downloads</span>
             </button>
 
+            {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg border border-border text-foreground-muted hover:text-foreground hover:bg-surface-muted transition-colors"
+              className="p-2 rounded-xl border border-border text-foreground-muted hover:text-foreground hover:bg-surface-muted transition-colors shadow-sm"
               title="Toggle Light/Dark Theme"
             >
               {theme === "dark" ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
             </button>
 
+            {/* Launch Platform CTA Button */}
             <Link
               href="/dashboard"
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-brand-700 hover:bg-brand-600 text-white transition-all shadow-subtle hover:shadow-card"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95"
             >
               <span>Launch Platform</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
+
+            {/* Mobile Hamburger Toggle */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden p-2 rounded-xl border border-border text-foreground-muted hover:text-foreground hover:bg-surface-muted transition-colors"
+              title="Toggle mobile menu"
+            >
+              <Menu className="w-4 h-4" />
+            </button>
           </div>
         </div>
+
+        {/* Mobile Navigation Drawer */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden border-t border-border bg-surface px-6 py-4 space-y-3 shadow-xl">
+            <div className="flex flex-col space-y-2">
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  scrollToSection("overview");
+                }}
+                className="text-left px-3 py-2 text-xs font-semibold text-foreground hover:bg-surface-muted rounded-lg"
+              >
+                Overview
+              </button>
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  scrollToSection("interactive-demo");
+                }}
+                className="text-left px-3 py-2 text-xs font-semibold text-foreground hover:bg-surface-muted rounded-lg"
+              >
+                Interactive Cleaning
+              </button>
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  scrollToSection("capabilities");
+                }}
+                className="text-left px-3 py-2 text-xs font-semibold text-foreground hover:bg-surface-muted rounded-lg"
+              >
+                Capabilities
+              </button>
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  scrollToSection("pipeline");
+                }}
+                className="text-left px-3 py-2 text-xs font-semibold text-foreground hover:bg-surface-muted rounded-lg"
+              >
+                5-Stage Pipeline
+              </button>
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  scrollToSection("how-it-works-and-downloads");
+                }}
+                className="text-left px-3 py-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:bg-surface-muted rounded-lg flex items-center gap-2"
+              >
+                <span>User Guide & Downloads</span>
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              </button>
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  scrollToSection("faq");
+                }}
+                className="text-left px-3 py-2 text-xs font-semibold text-foreground hover:bg-surface-muted rounded-lg"
+              >
+                FAQ
+              </button>
+            </div>
+
+            <div className="pt-2 border-t border-border flex items-center justify-between gap-3">
+              <Link
+                href="/dashboard"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex-1 py-2 text-center text-xs font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm"
+              >
+                Launch Platform
+              </Link>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* ── HERO SECTION WITH DOCTOR PHOTOGRAPHY BACKDROP ─────── */}
       <section id="overview" className="relative pt-12 pb-20 px-6 overflow-hidden border-b border-border">
         {/* Subtle Background Glows & Pattern */}
-        <div className="absolute inset-0 bg-gradient-to-b from-brand-950/15 via-transparent to-transparent pointer-events-none" />
-        <div className="absolute -top-40 right-10 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-emerald-950/15 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute -top-40 right-10 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Left Column: Headline & Value Prop */}
           <div className="lg:col-span-7 space-y-6 text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border border-brand-300 dark:border-brand-800 bg-brand-50/80 dark:bg-brand-950/40 text-brand-900 dark:text-brand-300 shadow-subtle">
-              <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse" />
-              <span>Australian Healthcare Provider Intelligence • 150 Sydney GPs Pilot Active</span>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold border border-emerald-500/30 bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Global Healthcare Provider Intelligence • Multi-Jurisdiction Cohort Active</span>
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-[1.12]">
               Turn unstructured provider rosters into{" "}
-              <span className="bg-gradient-to-r from-brand-600 to-emerald-500 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-emerald-500 to-teal-400 bg-clip-text text-transparent">
                 verified clinical datasets.
               </span>
             </h1>
 
             <p className="text-sm sm:text-base text-foreground-muted leading-relaxed max-w-2xl">
-              CareData AI is an enterprise data intelligence platform purpose-built for healthcare researchers and network analysts. Ingest messy provider spreadsheets, automatically standardize Australian telephone formats and doctor honorifics, classify specialties using AI, resolve duplicates, and export research-ready Excel files.
+              CareData AI is an enterprise data intelligence platform purpose-built for healthcare researchers and network analysts. Ingest messy provider spreadsheets, automatically standardize global telephone formats and doctor honorifics, classify specialties using AI, resolve duplicates, and export research-ready Excel files.
             </p>
 
             {/* Feature Bullets */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 text-xs text-foreground font-medium">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-brand-600 dark:text-brand-400 flex-shrink-0" />
-                <span>Australian Phone Normalization (02 & 04)</span>
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                <span>Global Phone Normalization (+91, +1, +977, +7, (02))</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-brand-600 dark:text-brand-400 flex-shrink-0" />
-                <span>AI Clinical Specialty Taxonomy (RACGP)</span>
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                <span>AI Clinical Specialty Taxonomy (RACGP, CMS, NMC, WHO)</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-brand-600 dark:text-brand-400 flex-shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
                 <span>Audit Trail: Original Raw Values Never Lost</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-brand-600 dark:text-brand-400 flex-shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
                 <span>Formatted Excel (.xlsx) & CSV Exports</span>
               </div>
             </div>
@@ -223,14 +309,14 @@ export default function LandingPage() {
             <div className="pt-4 flex flex-wrap items-center gap-3.5">
               <Link
                 href="/login"
-                className="inline-flex items-center gap-2 px-6 py-3 text-xs font-semibold rounded-lg bg-brand-700 hover:bg-brand-600 text-white shadow-card transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3 text-xs font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm hover:shadow-md transition-all active:scale-95"
               >
                 <span>Open Analyst Workspace</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <button
                 onClick={() => scrollToSection("interactive-demo")}
-                className="inline-flex items-center gap-2 px-5 py-3 text-xs font-semibold rounded-lg border border-border bg-surface hover:bg-surface-muted text-foreground transition-colors"
+                className="inline-flex items-center gap-2 px-5 py-3 text-xs font-semibold rounded-xl border border-border bg-surface hover:bg-surface-muted text-foreground transition-colors shadow-sm"
               >
                 <span>See Data Transformation</span>
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -255,10 +341,10 @@ export default function LandingPage() {
               <div className="absolute bottom-4 left-4 right-4 p-4 rounded-xl bg-surface/95 backdrop-blur-md border border-border shadow-card text-xs">
                 <div className="flex items-center justify-between pb-2 mb-2 border-b border-border">
                   <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-brand-500" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
                     <span className="font-semibold text-foreground">Verified Sydney Cohort</span>
                   </div>
-                  <span className="font-mono text-[10px] text-brand-600 dark:text-brand-400 font-semibold bg-brand-50 dark:bg-brand-950 px-2 py-0.5 rounded border border-brand-200 dark:border-brand-800">
+                  <span className="font-mono text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
                     150 GPs Ingested
                   </span>
                 </div>
@@ -273,7 +359,7 @@ export default function LandingPage() {
                   </div>
                   <div className="p-2 rounded bg-surface-muted border border-border">
                     <span className="text-[10px] text-foreground-muted block">Format Errors</span>
-                    <strong className="text-brand-600 dark:text-brand-400 font-mono text-xs">0 Unresolved</strong>
+                    <strong className="text-emerald-600 dark:text-emerald-400 font-mono text-xs">0 Unresolved</strong>
                   </div>
                 </div>
               </div>
@@ -285,7 +371,7 @@ export default function LandingPage() {
       {/* ── INTERACTIVE DEMO: BEFORE VS AFTER TRANSFORMATION ─── */}
       <section id="interactive-demo" className="py-16 px-6 max-w-7xl mx-auto border-b border-border">
         <div className="text-center max-w-2xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-brand-50 dark:bg-brand-950 text-brand-800 dark:text-brand-300 border border-brand-200 dark:border-brand-800 mb-3">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 mb-3">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Interactive Data Comparison</span>
           </div>
@@ -300,9 +386,9 @@ export default function LandingPage() {
           <div className="mt-6 inline-flex p-1 rounded-xl bg-surface-muted border border-border">
             <button
               onClick={() => setActiveTab("raw")}
-              className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+              className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all ${
                 activeTab === "raw"
-                  ? "bg-surface text-foreground shadow-subtle border border-border"
+                  ? "bg-surface text-emerald-600 dark:text-emerald-400 font-bold shadow-subtle border border-border"
                   : "text-foreground-muted hover:text-foreground"
               }`}
             >
@@ -310,9 +396,9 @@ export default function LandingPage() {
             </button>
             <button
               onClick={() => setActiveTab("cleaned")}
-              className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5 ${
+              className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5 ${
                 activeTab === "cleaned"
-                  ? "bg-brand-700 text-white shadow-subtle"
+                  ? "bg-surface text-emerald-600 dark:text-emerald-400 font-bold shadow-subtle border border-border"
                   : "text-foreground-muted hover:text-foreground"
               }`}
             >
@@ -336,7 +422,7 @@ export default function LandingPage() {
             <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold ${
               activeTab === "raw"
                 ? "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300"
-                : "bg-brand-100 text-brand-800 dark:bg-brand-950 dark:text-brand-300 border border-brand-300"
+                : "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300"
             }`}>
               {activeTab === "raw" ? "Needs Pipeline Review" : "Validated & Clean"}
             </span>
@@ -396,47 +482,47 @@ export default function LandingPage() {
                   </>
                 ) : (
                   <>
-                    <tr className="bg-brand-50/20 dark:bg-brand-950/10">
+                    <tr className="bg-emerald-50/20 dark:bg-emerald-950/10">
                       <td className="py-3.5 px-4 font-medium text-foreground">Dr. Liam Campbell</td>
-                      <td className="py-3.5 px-4 font-medium text-brand-600 dark:text-brand-400">
+                      <td className="py-3.5 px-4 font-medium text-emerald-600 dark:text-emerald-400">
                         General Practice / Family Medicine
                         <span className="block text-[10px] text-foreground-muted font-mono font-normal">AI Match: 98% Confidence</span>
                       </td>
                       <td className="py-3.5 px-4 text-foreground">Surry Hills Medical Centre</td>
-                      <td className="py-3.5 px-4 font-mono text-brand-600 dark:text-brand-400 font-semibold">(02) 9319 1234</td>
+                      <td className="py-3.5 px-4 font-mono text-emerald-600 dark:text-emerald-400 font-semibold">(02) 9319 1234</td>
                       <td className="py-3.5 px-4 text-foreground">Surry Hills, NSW</td>
                       <td className="py-3.5 px-4">
-                        <span className="px-2 py-0.5 rounded-full text-[10px] bg-brand-100 text-brand-800 dark:bg-brand-950 dark:text-brand-300 border border-brand-200">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200">
                           Clean ✓
                         </span>
                       </td>
                     </tr>
-                    <tr className="bg-brand-50/20 dark:bg-brand-950/10">
+                    <tr className="bg-emerald-50/20 dark:bg-emerald-950/10">
                       <td className="py-3.5 px-4 font-medium text-foreground">Dr. Sarah Chen</td>
-                      <td className="py-3.5 px-4 font-medium text-brand-600 dark:text-brand-400">
+                      <td className="py-3.5 px-4 font-medium text-emerald-600 dark:text-emerald-400">
                         Women's Health & Antenatal Care
                         <span className="block text-[10px] text-foreground-muted font-mono font-normal">AI Match: 96% Confidence</span>
                       </td>
                       <td className="py-3.5 px-4 text-foreground">Bondi Health Collective</td>
-                      <td className="py-3.5 px-4 font-mono text-brand-600 dark:text-brand-400 font-semibold">(02) 9130 5522</td>
+                      <td className="py-3.5 px-4 font-mono text-emerald-600 dark:text-emerald-400 font-semibold">(02) 9130 5522</td>
                       <td className="py-3.5 px-4 text-foreground">Bondi, NSW</td>
                       <td className="py-3.5 px-4">
-                        <span className="px-2 py-0.5 rounded-full text-[10px] bg-brand-100 text-brand-800 dark:bg-brand-950 dark:text-brand-300 border border-brand-200">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200">
                           Clean ✓
                         </span>
                       </td>
                     </tr>
-                    <tr className="bg-brand-50/20 dark:bg-brand-950/10">
+                    <tr className="bg-emerald-50/20 dark:bg-emerald-950/10">
                       <td className="py-3.5 px-4 font-medium text-foreground">Dr. Marcus Vance</td>
-                      <td className="py-3.5 px-4 font-medium text-brand-600 dark:text-brand-400">
+                      <td className="py-3.5 px-4 font-medium text-emerald-600 dark:text-emerald-400">
                         Skin Cancer Medicine
                         <span className="block text-[10px] text-foreground-muted font-mono font-normal">AI Match: 95% Confidence</span>
                       </td>
                       <td className="py-3.5 px-4 text-foreground">Chatswood Healthcare Centre</td>
-                      <td className="py-3.5 px-4 font-mono text-brand-600 dark:text-brand-400 font-semibold">(02) 9411 8899</td>
+                      <td className="py-3.5 px-4 font-mono text-emerald-600 dark:text-emerald-400 font-semibold">(02) 9411 8899</td>
                       <td className="py-3.5 px-4 text-foreground">Chatswood, NSW</td>
                       <td className="py-3.5 px-4">
-                        <span className="px-2 py-0.5 rounded-full text-[10px] bg-brand-100 text-brand-800 dark:bg-brand-950 dark:text-brand-300 border border-brand-200">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200">
                           Clean ✓
                         </span>
                       </td>
@@ -481,7 +567,7 @@ export default function LandingPage() {
                 </p>
               </div>
               <div className="pt-4 mt-4 border-t border-border flex items-center justify-between text-xs">
-                <span className="font-semibold text-brand-600 dark:text-brand-400">Zero Overwrites</span>
+                <span className="font-semibold text-emerald-600 dark:text-emerald-400">Zero Overwrites</span>
                 <span className="text-[11px] text-foreground-muted">Preserves Raw Uploads</span>
               </div>
             </div>
@@ -507,7 +593,7 @@ export default function LandingPage() {
                 </p>
               </div>
               <div className="pt-4 mt-4 border-t border-border flex items-center justify-between text-xs">
-                <span className="font-semibold text-brand-600 dark:text-brand-400">RACGP Taxonomy</span>
+                <span className="font-semibold text-emerald-600 dark:text-emerald-400">RACGP Taxonomy</span>
                 <span className="text-[11px] text-foreground-muted">Offline Rule Fallback</span>
               </div>
             </div>
@@ -533,7 +619,7 @@ export default function LandingPage() {
                 </p>
               </div>
               <div className="pt-4 mt-4 border-t border-border flex items-center justify-between text-xs">
-                <span className="font-semibold text-brand-600 dark:text-brand-400">Openpyxl XLSX + CSV</span>
+                <span className="font-semibold text-emerald-600 dark:text-emerald-400">Openpyxl XLSX + CSV</span>
                 <span className="text-[11px] text-foreground-muted">5 Formatted Reports</span>
               </div>
             </div>
@@ -544,7 +630,7 @@ export default function LandingPage() {
       {/* ── 5-STAGE PIPELINE EXPLAINER ───────────────────────── */}
       <section id="pipeline" className="py-16 px-6 max-w-7xl mx-auto border-b border-border">
         <div className="text-center max-w-xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-brand-50 dark:bg-brand-950 text-brand-800 dark:text-brand-300 border border-brand-200 dark:border-brand-800 mb-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 mb-2">
             <Activity className="w-3.5 h-3.5" />
             <span>Complete Lifecycle</span>
           </div>
@@ -559,7 +645,7 @@ export default function LandingPage() {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div className="p-4 rounded-xl bg-surface border border-border shadow-subtle flex flex-col justify-between">
             <div>
-              <span className="w-7 h-7 rounded-lg bg-brand-50 dark:bg-brand-950 text-brand-700 dark:text-brand-300 border border-brand-200 dark:border-brand-800 flex items-center justify-center font-mono font-bold text-xs mb-3">
+              <span className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center font-mono font-bold text-xs mb-3">
                 01
               </span>
               <h4 className="text-xs font-bold text-foreground">Data Cleaning</h4>
@@ -567,14 +653,14 @@ export default function LandingPage() {
                 Applies Australian phone regex, strips corrupted characters, and formats doctor titles.
               </p>
             </div>
-            <span className="text-[10px] font-mono text-brand-600 dark:text-brand-400 mt-3 pt-2 border-t border-border">
+            <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 mt-3 pt-2 border-t border-border">
               Standardization
             </span>
           </div>
 
           <div className="p-4 rounded-xl bg-surface border border-border shadow-subtle flex flex-col justify-between">
             <div>
-              <span className="w-7 h-7 rounded-lg bg-brand-50 dark:bg-brand-950 text-brand-700 dark:text-brand-300 border border-brand-200 dark:border-brand-800 flex items-center justify-center font-mono font-bold text-xs mb-3">
+              <span className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center font-mono font-bold text-xs mb-3">
                 02
               </span>
               <h4 className="text-xs font-bold text-foreground">Duplicate Detection</h4>
@@ -582,14 +668,14 @@ export default function LandingPage() {
                 Calculates pairwise name token similarity and flags identical practice contact points.
               </p>
             </div>
-            <span className="text-[10px] font-mono text-brand-600 dark:text-brand-400 mt-3 pt-2 border-t border-border">
+            <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 mt-3 pt-2 border-t border-border">
               Similarity Engine
             </span>
           </div>
 
           <div className="p-4 rounded-xl bg-surface border border-border shadow-subtle flex flex-col justify-between">
             <div>
-              <span className="w-7 h-7 rounded-lg bg-brand-50 dark:bg-brand-950 text-brand-700 dark:text-brand-300 border border-brand-200 dark:border-brand-800 flex items-center justify-center font-mono font-bold text-xs mb-3">
+              <span className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center font-mono font-bold text-xs mb-3">
                 03
               </span>
               <h4 className="text-xs font-bold text-foreground">AI Classification</h4>
@@ -597,14 +683,14 @@ export default function LandingPage() {
                 Groq LLM harmonizes raw provider bio notes into RACGP approved specialty categories.
               </p>
             </div>
-            <span className="text-[10px] font-mono text-brand-600 dark:text-brand-400 mt-3 pt-2 border-t border-border">
+            <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 mt-3 pt-2 border-t border-border">
               Groq Clinical Model
             </span>
           </div>
 
           <div className="p-4 rounded-xl bg-surface border border-border shadow-subtle flex flex-col justify-between">
             <div>
-              <span className="w-7 h-7 rounded-lg bg-brand-50 dark:bg-brand-950 text-brand-700 dark:text-brand-300 border border-brand-200 dark:border-brand-800 flex items-center justify-center font-mono font-bold text-xs mb-3">
+              <span className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center font-mono font-bold text-xs mb-3">
                 04
               </span>
               <h4 className="text-xs font-bold text-foreground">Quality Validation</h4>
@@ -612,14 +698,14 @@ export default function LandingPage() {
                 Scores record completeness and queues invalid or missing fields for analyst approval.
               </p>
             </div>
-            <span className="text-[10px] font-mono text-brand-600 dark:text-brand-400 mt-3 pt-2 border-t border-border">
+            <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 mt-3 pt-2 border-t border-border">
               Health Scoring
             </span>
           </div>
 
           <div className="p-4 rounded-xl bg-surface border border-border shadow-subtle flex flex-col justify-between">
             <div>
-              <span className="w-7 h-7 rounded-lg bg-brand-50 dark:bg-brand-950 text-brand-700 dark:text-brand-300 border border-brand-200 dark:border-brand-800 flex items-center justify-center font-mono font-bold text-xs mb-3">
+              <span className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center font-mono font-bold text-xs mb-3">
                 05
               </span>
               <h4 className="text-xs font-bold text-foreground">Save & Audit</h4>
@@ -627,7 +713,7 @@ export default function LandingPage() {
                 Commits validated records, creates immutable audit trails, and unlocks report exports.
               </p>
             </div>
-            <span className="text-[10px] font-mono text-brand-600 dark:text-brand-400 mt-3 pt-2 border-t border-border">
+            <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 mt-3 pt-2 border-t border-border">
               SQLite & Provenance
             </span>
           </div>
@@ -637,7 +723,7 @@ export default function LandingPage() {
       {/* ── SECTION: HOW IT WORKS, HOW TO USE IT & WHAT TO DOWNLOAD ────── */}
       <section id="how-it-works-and-downloads" className="py-20 px-6 max-w-7xl mx-auto border-b border-border">
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-brand-50 dark:bg-brand-950 text-brand-800 dark:text-brand-300 border border-brand-200 dark:border-brand-800 mb-3">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 mb-3">
             <BookOpen className="w-3.5 h-3.5" />
             <span>Complete Operational Manual</span>
           </div>
@@ -655,7 +741,7 @@ export default function LandingPage() {
               onClick={() => setGuideSubTab("how-it-works")}
               className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all flex items-center gap-2 ${
                 guideSubTab === "how-it-works"
-                  ? "bg-surface text-foreground shadow-subtle border border-border"
+                  ? "bg-surface text-emerald-600 dark:text-emerald-400 shadow-subtle border border-border font-bold"
                   : "text-foreground-muted hover:text-foreground"
               }`}
             >
@@ -666,7 +752,7 @@ export default function LandingPage() {
               onClick={() => setGuideSubTab("how-to-use")}
               className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all flex items-center gap-2 ${
                 guideSubTab === "how-to-use"
-                  ? "bg-surface text-foreground shadow-subtle border border-border"
+                  ? "bg-surface text-emerald-600 dark:text-emerald-400 shadow-subtle border border-border font-bold"
                   : "text-foreground-muted hover:text-foreground"
               }`}
             >
@@ -677,7 +763,7 @@ export default function LandingPage() {
               onClick={() => setGuideSubTab("downloads")}
               className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all flex items-center gap-2 ${
                 guideSubTab === "downloads"
-                  ? "bg-brand-700 text-white shadow-subtle"
+                  ? "bg-surface text-emerald-600 dark:text-emerald-400 shadow-subtle border border-border font-bold"
                   : "text-foreground-muted hover:text-foreground"
               }`}
             >
@@ -710,7 +796,7 @@ export default function LandingPage() {
 
               <div className="p-6 rounded-2xl bg-surface border border-border shadow-card flex flex-col justify-between">
                 <div>
-                  <div className="w-10 h-10 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-400 border border-brand-500/20 flex items-center justify-center mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center justify-center mb-4">
                     <ShieldCheck className="w-5 h-5" />
                   </div>
                   <h3 className="text-base font-bold text-foreground">2. Deterministic Cleaning</h3>
@@ -721,7 +807,7 @@ export default function LandingPage() {
                 </div>
                 <div className="pt-4 mt-4 border-t border-border flex items-center justify-between text-[11px] text-foreground-muted font-mono">
                   <span>Phone Standards:</span>
-                  <span className="font-semibold text-brand-600 dark:text-brand-400">E.164 Strict Regex</span>
+                  <span className="font-semibold text-emerald-600 dark:text-emerald-400">E.164 Strict Regex</span>
                 </div>
               </div>
 
@@ -746,7 +832,7 @@ export default function LandingPage() {
             {/* Global Regulatory Standards Strip */}
             <div className="p-5 rounded-2xl bg-surface-muted border border-border flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <Globe2 className="w-6 h-6 text-brand-600 dark:text-brand-400 flex-shrink-0" />
+                <Globe2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
                 <div>
                   <h4 className="text-xs font-bold text-foreground">Multi-Jurisdiction Healthcare Directory Support</h4>
                   <p className="text-[11px] text-foreground-muted">
@@ -776,7 +862,7 @@ export default function LandingPage() {
         {guideSubTab === "how-to-use" && (
           <div className="max-w-4xl mx-auto space-y-4 animate-in fade-in duration-300 text-xs">
             <div className="p-5 rounded-2xl bg-surface border border-border shadow-card flex items-start gap-4">
-              <span className="w-8 h-8 rounded-xl bg-brand-500/10 text-brand-700 dark:text-brand-300 font-mono font-bold text-sm flex items-center justify-center flex-shrink-0">
+              <span className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-mono font-bold text-sm flex items-center justify-center flex-shrink-0">
                 1
               </span>
               <div>
@@ -789,7 +875,7 @@ export default function LandingPage() {
             </div>
 
             <div className="p-5 rounded-2xl bg-surface border border-border shadow-card flex items-start gap-4">
-              <span className="w-8 h-8 rounded-xl bg-brand-500/10 text-brand-700 dark:text-brand-300 font-mono font-bold text-sm flex items-center justify-center flex-shrink-0">
+              <span className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-mono font-bold text-sm flex items-center justify-center flex-shrink-0">
                 2
               </span>
               <div>
@@ -802,7 +888,7 @@ export default function LandingPage() {
             </div>
 
             <div className="p-5 rounded-2xl bg-surface border border-border shadow-card flex items-start gap-4">
-              <span className="w-8 h-8 rounded-xl bg-brand-500/10 text-brand-700 dark:text-brand-300 font-mono font-bold text-sm flex items-center justify-center flex-shrink-0">
+              <span className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-mono font-bold text-sm flex items-center justify-center flex-shrink-0">
                 3
               </span>
               <div>
@@ -815,7 +901,7 @@ export default function LandingPage() {
             </div>
 
             <div className="p-5 rounded-2xl bg-surface border border-border shadow-card flex items-start gap-4">
-              <span className="w-8 h-8 rounded-xl bg-brand-500/10 text-brand-700 dark:text-brand-300 font-mono font-bold text-sm flex items-center justify-center flex-shrink-0">
+              <span className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-mono font-bold text-sm flex items-center justify-center flex-shrink-0">
                 4
               </span>
               <div>
@@ -828,7 +914,7 @@ export default function LandingPage() {
             </div>
 
             <div className="p-5 rounded-2xl bg-surface border border-border shadow-card flex items-start gap-4">
-              <span className="w-8 h-8 rounded-xl bg-brand-500/10 text-brand-700 dark:text-brand-300 font-mono font-bold text-sm flex items-center justify-center flex-shrink-0">
+              <span className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-mono font-bold text-sm flex items-center justify-center flex-shrink-0">
                 5
               </span>
               <div>
@@ -845,7 +931,7 @@ export default function LandingPage() {
         {/* Tab 3: What to Download & For What Purpose */}
         {guideSubTab === "downloads" && (
           <div className="space-y-4 animate-in fade-in duration-300">
-            <div className="p-4 rounded-xl bg-brand-500/10 border border-brand-500/20 text-xs">
+            <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs">
               <span className="font-bold text-foreground block">
                 Official Export Catalog: 5 Specialized Enterprise Deliverables
               </span>
@@ -876,7 +962,7 @@ export default function LandingPage() {
                 <button
                   onClick={() => handleDownload("cleaned", "cleaned_provider_dataset.xlsx")}
                   disabled={downloading === "cleaned"}
-                  className="mt-4 w-full py-2 px-3 rounded-xl bg-brand-700 hover:bg-brand-600 text-white font-semibold text-xs flex items-center justify-center gap-2 transition-colors"
+                  className="mt-4 w-full py-2 px-3 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-semibold text-xs flex items-center justify-center gap-2 transition-colors"
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>{downloading === "cleaned" ? "Compiling..." : "Download Cleaned Roster (Excel)"}</span>
@@ -971,7 +1057,7 @@ export default function LandingPage() {
       {/* ── USER GUIDE & FAQ SECTION ─────────────────────────── */}
       <section id="faq" className="py-16 px-6 max-w-4xl mx-auto border-b border-border">
         <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-brand-50 dark:bg-brand-950 text-brand-800 dark:text-brand-300 border border-brand-200 dark:border-brand-800 mb-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 mb-2">
             <HelpCircle className="w-3.5 h-3.5" />
             <span>Clear User Guide</span>
           </div>
@@ -986,7 +1072,7 @@ export default function LandingPage() {
         <div className="space-y-4 text-xs">
           <div className="p-4 rounded-xl bg-surface border border-border shadow-subtle">
             <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-brand-600 dark:text-brand-400" />
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               What format of provider data can I upload?
             </h3>
             <p className="text-foreground-muted mt-2 leading-relaxed">
@@ -996,7 +1082,7 @@ export default function LandingPage() {
 
           <div className="p-4 rounded-xl bg-surface border border-border shadow-subtle">
             <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-brand-600 dark:text-brand-400" />
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               Are my original uploaded values ever lost or overwritten?
             </h3>
             <p className="text-foreground-muted mt-2 leading-relaxed">
@@ -1006,7 +1092,7 @@ export default function LandingPage() {
 
           <div className="p-4 rounded-xl bg-surface border border-border shadow-subtle">
             <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-brand-600 dark:text-brand-400" />
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               Does CareData AI handle sensitive patient health information (PHI)?
             </h3>
             <p className="text-foreground-muted mt-2 leading-relaxed">
@@ -1037,7 +1123,7 @@ export default function LandingPage() {
         </div>
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px]">
           <span>© 2026 CareData AI Platform. All rights reserved. Built for Global Primary Care Intelligence.</span>
-          <span className="font-mono text-brand-600 dark:text-brand-400">Global Provider Directory • Multi-Jurisdiction Engine</span>
+          <span className="font-mono text-emerald-600 dark:text-emerald-400">Global Provider Directory • Multi-Jurisdiction Engine</span>
         </div>
       </footer>
 
@@ -1049,3 +1135,4 @@ export default function LandingPage() {
     </div>
   );
 }
+

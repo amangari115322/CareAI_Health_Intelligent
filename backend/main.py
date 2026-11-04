@@ -817,8 +817,28 @@ def query_explorer_providers(
     
     if search:
         s = f"%{search}%"
-        where_clauses.append("(accepted_doctor_name LIKE ? OR accepted_practice_name LIKE ? OR suburb LIKE ? OR accepted_address LIKE ?)")
-        params.extend([s, s, s, s])
+        search_lower = search.strip().lower()
+        
+        # Enhanced geographic and multi-field keyword resolution
+        geo_clauses = []
+        if search_lower in ("india", "in", "indian", "delhi", "hyderabad", "gurugram"):
+            geo_clauses.append("state IN ('Telangana', 'Delhi', 'Haryana') OR accepted_address LIKE '%India%' OR accepted_phone LIKE '+91%'")
+        elif search_lower in ("russia", "ru", "russian", "moscow"):
+            geo_clauses.append("state = 'Moscow' OR accepted_address LIKE '%Moscow%' OR accepted_phone LIKE '+7%'")
+        elif search_lower in ("usa", "us", "united states", "america"):
+            geo_clauses.append("state IN ('MN', 'MD', 'OH') OR accepted_phone LIKE '+1%'")
+        elif search_lower in ("nepal", "np", "nepalese", "kathmandu", "lalitpur"):
+            geo_clauses.append("state = 'Bagmati' OR accepted_address LIKE '%Kathmandu%' OR accepted_phone LIKE '+977%'")
+        elif search_lower in ("australia", "au", "australian", "sydney", "nsw"):
+            geo_clauses.append("state = 'NSW' OR accepted_address LIKE '%NSW%' OR accepted_phone LIKE '(02)%'")
+            
+        base_match = "(accepted_doctor_name LIKE ? OR accepted_practice_name LIKE ? OR suburb LIKE ? OR state LIKE ? OR accepted_address LIKE ? OR ai_suggested_category LIKE ? OR collected_specialty LIKE ?)"
+        params.extend([s, s, s, s, s, s, s])
+        
+        if geo_clauses:
+            where_clauses.append(f"({base_match} OR {' OR '.join(geo_clauses)})")
+        else:
+            where_clauses.append(base_match)
     if specialty:
         where_clauses.append("(ai_suggested_category = ? OR collected_specialty = ?)")
         params.extend([specialty, specialty])
@@ -1088,19 +1108,19 @@ def download_report(report_type: str, format: str = Query("xlsx", regex="^(xlsx|
     
     timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M")
     
-    if report_type == "cleaned_dataset":
+    if report_type in ("cleaned_dataset", "cleaned"):
         content = export_cleaned_dataset(providers, format)
         filename = f"caredata_cleaned_providers_{timestamp}.{format}"
-    elif report_type == "quality_issues":
+    elif report_type in ("quality_issues", "quality"):
         content = export_quality_issues(issues, format)
         filename = f"caredata_quality_issues_{timestamp}.{format}"
-    elif report_type == "duplicate_candidates":
+    elif report_type in ("duplicate_candidates", "duplicates"):
         content = export_duplicate_candidates(duplicates, format)
         filename = f"caredata_duplicates_{timestamp}.{format}"
-    elif report_type == "ai_classifications":
+    elif report_type in ("ai_classifications", "specialties"):
         content = export_ai_classifications(providers, format)
         filename = f"caredata_ai_classifications_{timestamp}.{format}"
-    elif report_type == "source_evidence":
+    elif report_type in ("source_evidence", "evidence"):
         content = export_source_evidence(providers, format)
         filename = f"caredata_source_evidence_{timestamp}.{format}"
     else:

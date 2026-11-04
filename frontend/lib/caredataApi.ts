@@ -312,6 +312,35 @@ export const api = {
   getExportUrl(reportType: string, format: "xlsx" | "csv" = "xlsx") {
     return `${API_BASE}/export/${reportType}?format=${format}`;
   },
+  async downloadReport(reportType: string, filename?: string) {
+    const mapping: Record<string, string> = {
+      cleaned: "cleaned",
+      quality: "quality_issues",
+      quality_issues: "quality_issues",
+      duplicates: "duplicate_candidates",
+      duplicate_candidates: "duplicate_candidates",
+      specialties: "ai_classifications",
+      ai_classifications: "ai_classifications",
+      source_evidence: "source_evidence",
+    };
+    const mappedType = mapping[reportType] || reportType;
+    const format = filename?.endsWith(".csv") ? "csv" : "xlsx";
+    const url = `${API_BASE}/export/${mappedType}?format=${format}`;
+
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`Failed to download report (${res.status} ${res.statusText})`);
+    }
+    const blob = await res.blob();
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = filename || `caredata_${mappedType}.${format}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(downloadUrl);
+  },
 
   // Collection
   async getCollectionSources() {

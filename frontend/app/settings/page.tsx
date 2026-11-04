@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Settings,
   Shield,
@@ -15,11 +16,24 @@ import {
   Plus,
   Trash2,
   X,
+  Search,
   Globe2,
+  MapPin,
+  ArrowRight,
 } from "lucide-react";
 import { api } from "../../lib/caredataApi";
 
+const QUICK_LOCATIONS = [
+  { label: "India", query: "India", flag: "🇮🇳", sub: "NMC / ABDM" },
+  { label: "Russia", query: "Russia", flag: "🇷🇺", sub: "WHO / Moscow" },
+  { label: "Sydney, Australia", query: "Sydney", flag: "🇦🇺", sub: "AHPRA / RACGP" },
+  { label: "United States", query: "United States", flag: "🇺🇸", sub: "CMS / NPI" },
+  { label: "Nepal", query: "Nepal", flag: "🇳🇵", sub: "NMC / MoHP" },
+  { label: "Global", query: "", flag: "🌐", sub: "All Regions" },
+];
+
 export default function SettingsPage() {
+  const router = useRouter();
   const [settings, setSettings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -54,6 +68,31 @@ export default function SettingsPage() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleSearchLocationInExplorer = async () => {
+    const loc = settings.general?.default_location || "";
+    // Save to settings first so it persists
+    try {
+      await api.saveSettings(settings);
+    } catch (e) {}
+    // Navigate to explorer with search query
+    router.push(`/explorer?search=${encodeURIComponent(loc.trim())}`);
+  };
+
+  const handleLocationKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSearchLocationInExplorer();
+    }
+  };
+
+  const handleSelectQuickLocation = (loc: { label: string; query: string }) => {
+    const updated = {
+      ...settings,
+      general: { ...settings.general, default_location: loc.label },
+    };
+    setSettings(updated);
   };
 
   const handleResetDefaults = async () => {
@@ -95,6 +134,8 @@ export default function SettingsPage() {
     );
   }
 
+  const currentLocation = settings.general?.default_location || "";
+
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-12 pt-1">
       {/* ── HEADER ───────────────────────────────────────────── */}
@@ -134,15 +175,21 @@ export default function SettingsPage() {
         </div>
       )}
 
-      {/* ── 1. GENERAL SETTINGS (FIXED INPUT FOR DEFAULT LOCATION) ── */}
+      {/* ── 1. GENERAL SETTINGS WITH WORKABLE RESEARCH LOCATION SEARCH ── */}
       <div className="p-5 rounded-2xl border border-border bg-surface shadow-sm space-y-4">
-        <h2 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
-          <Layers className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> General Workspace Defaults
-        </h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
+            <Layers className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> General Workspace Defaults
+          </h2>
+          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold border border-emerald-500/20">
+            Active Multi-Jurisdiction
+          </span>
+        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+        <div className="space-y-4 text-xs">
+          {/* Active Project Field */}
           <div>
-            <label className="text-foreground-muted font-medium block mb-1.5">Active Pilot Project</label>
+            <label className="text-foreground-muted font-medium block mb-1.5">Active Workspace Slug</label>
             <input
               type="text"
               value={settings.general?.default_project ?? "sydney-gp-pilot"}
@@ -152,10 +199,15 @@ export default function SettingsPage() {
             <span className="text-[10px] text-foreground-muted mt-1 block">Read-only project workspace slug</span>
           </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="text-foreground font-medium block">Default Research Location</label>
-              {Boolean(settings.general?.default_location) && (
+          {/* Default Research Location Search Field */}
+          <div className="p-4 rounded-xl border border-emerald-500/30 bg-emerald-500/5 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <label className="text-foreground font-bold">Default Research Location & Search Scope</label>
+              </div>
+
+              {Boolean(currentLocation) && (
                 <button
                   type="button"
                   onClick={() =>
@@ -167,42 +219,109 @@ export default function SettingsPage() {
                   className="text-[11px] text-foreground-muted hover:text-red-500 font-medium transition-colors flex items-center gap-0.5"
                   title="Clear location field"
                 >
-                  <X className="w-3 h-3" /> Clear
+                  <X className="w-3 h-3" /> Clear Location
                 </button>
               )}
             </div>
 
-            <div className="relative">
-              <input
-                type="text"
-                value={settings.general?.default_location ?? ""}
-                onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    general: { ...settings.general, default_location: e.target.value },
-                  })
-                }
-                placeholder="e.g. Sydney, Australia (or Global / USA / India / Nepal)"
-                className="w-full px-3.5 py-2 text-xs rounded-xl bg-surface border border-border text-foreground placeholder:text-foreground-muted/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all shadow-sm"
-              />
-              {Boolean(settings.general?.default_location) && (
-                <button
-                  type="button"
-                  onClick={() =>
+            {/* Input with inline actions */}
+            <div className="relative flex flex-col sm:flex-row gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-muted pointer-events-none" />
+                <input
+                  type="text"
+                  value={currentLocation}
+                  onChange={(e) =>
                     setSettings({
                       ...settings,
-                      general: { ...settings.general, default_location: "" },
+                      general: { ...settings.general, default_location: e.target.value },
                     })
                   }
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-foreground-muted hover:text-foreground rounded transition-colors"
+                  onKeyDown={handleLocationKeyDown}
+                  placeholder="Type location (e.g. India, Russia, Sydney, USA, Nepal) and press Enter..."
+                  className="w-full pl-10 pr-9 py-2.5 text-xs rounded-xl bg-surface border border-border text-foreground placeholder:text-foreground-muted/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all shadow-sm"
+                />
+                {Boolean(currentLocation) && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setSettings({
+                        ...settings,
+                        general: { ...settings.general, default_location: "" },
+                      })
+                    }
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-foreground-muted hover:text-foreground rounded transition-colors"
+                    title="Clear"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleSearchLocationInExplorer}
+                  className="px-4 py-2.5 text-xs font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm transition-all flex items-center gap-1.5 whitespace-nowrap"
+                  title="Search this location in the live Data Explorer"
                 >
-                  <X className="w-3.5 h-3.5" />
+                  <Search className="w-3.5 h-3.5" />
+                  <span>Search in Explorer</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </button>
-              )}
+
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  className="px-3.5 py-2.5 text-xs font-semibold rounded-xl border border-border bg-surface hover:bg-surface-muted text-foreground shadow-sm transition-all whitespace-nowrap"
+                  title="Save as default workspace location"
+                >
+                  Save
+                </button>
+              </div>
             </div>
-            <span className="text-[10px] text-foreground-muted mt-1 block">
-              Default geographic scope used for entity resolution and regional validation rules.
-            </span>
+
+            {/* Quick Country / Location Select Pills */}
+            <div className="space-y-1.5 pt-1">
+              <span className="text-[11px] font-medium text-foreground-muted block">
+                Quick Select Healthcare Jurisdiction:
+              </span>
+              <div className="flex flex-wrap items-center gap-1.5">
+                {QUICK_LOCATIONS.map((loc) => {
+                  const isActive =
+                    currentLocation.toLowerCase().includes(loc.label.toLowerCase()) ||
+                    (loc.label === "Global" && !currentLocation);
+                  return (
+                    <button
+                      key={loc.label}
+                      type="button"
+                      onClick={() => handleSelectQuickLocation(loc)}
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] transition-all ${
+                        isActive
+                          ? "bg-emerald-600 text-white font-semibold shadow-sm"
+                          : "bg-surface border border-border text-foreground hover:bg-surface-muted"
+                      }`}
+                    >
+                      <span>{loc.flag}</span>
+                      <span>{loc.label}</span>
+                      <span className={`text-[9px] ${isActive ? "text-emerald-100" : "text-foreground-muted"}`}>
+                        ({loc.sub})
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Purpose & Help Explanation Banner */}
+            <div className="p-3 rounded-xl bg-surface border border-border/70 text-[11px] text-foreground-muted leading-relaxed">
+              <span className="font-semibold text-foreground block mb-0.5">
+                💡 Purpose of this section:
+              </span>
+              Defines the active territorial jurisdiction for clinical validation rules, phone number standards (+91, +7, +1, (02)), and practitioner searches.
+              Typing a country or city and clicking <strong className="text-foreground">Search in Explorer</strong> (or pressing <strong className="text-foreground">Enter</strong>) will instantly query all doctors, clinics, and specialties registered in that region.
+            </div>
           </div>
         </div>
       </div>
