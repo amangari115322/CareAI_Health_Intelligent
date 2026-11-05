@@ -1,4 +1,7 @@
 /** @type {import('next').NextConfig} */
+const backendUrl = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || "http://localhost:8000";
+const cleanBackend = backendUrl.replace(/\/api\/?$/, "").replace(/\/+$/, "");
+
 const nextConfig = {
   reactStrictMode: true,
   eslint: {
@@ -8,14 +11,18 @@ const nextConfig = {
     ignoreBuildErrors: false,
   },
   async rewrites() {
+    // In production without a designated backend, avoid rewriting to localhost
+    if (process.env.NODE_ENV === "production" && !process.env.NEXT_PUBLIC_API_URL && !process.env.BACKEND_URL) {
+      return [];
+    }
     return [
       {
         source: "/api/:path*",
-        destination: "http://localhost:8000/api/:path*",
+        destination: `${cleanBackend}/api/:path*`,
       },
       {
         source: "/ws/:path*",
-        destination: "http://localhost:8000/ws/:path*",
+        destination: `${cleanBackend}/ws/:path*`,
       },
     ];
   },

@@ -3,7 +3,24 @@
  * Fully typed client communicating with FastAPI backend (http://localhost:8000/api)
  */
 
-let rawBase = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").trim().replace(/\/+$/, "");
+let rawBase = (process.env.NEXT_PUBLIC_API_URL || "").trim().replace(/\/+$/, "");
+
+if (typeof window !== "undefined") {
+  const isLocalHost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  if (!isLocalHost) {
+    const savedBackend = localStorage.getItem("caredata_backend_url");
+    if (savedBackend) {
+      rawBase = savedBackend.trim().replace(/\/+$/, "");
+    } else if (!rawBase || rawBase.includes("localhost") || rawBase.includes("127.0.0.1")) {
+      rawBase = window.location.origin;
+    }
+  }
+}
+
+if (!rawBase) {
+  rawBase = "http://localhost:8000";
+}
+
 if (!rawBase.startsWith("http://") && !rawBase.startsWith("https://")) {
   rawBase = `https://${rawBase}`;
 }
