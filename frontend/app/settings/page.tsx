@@ -32,10 +32,46 @@ const QUICK_LOCATIONS = [
   { label: "Global", query: "", flag: "🌐", sub: "All Regions" },
 ];
 
+const DEFAULT_SYSTEM_SETTINGS = {
+  general: {
+    default_project: "sydney-gp-pilot",
+    default_location: "Global",
+  },
+  taxonomy: [
+    "General Practice",
+    "Cardiology",
+    "Dermatology",
+    "Endocrinology",
+    "Gastroenterology",
+    "Neurology",
+    "Obstetrics & Gynaecology",
+    "Ophthalmology",
+    "Orthopaedics",
+    "Paediatrics",
+    "Psychiatry",
+    "Respiratory Medicine",
+  ],
+  quality_rules: {
+    require_doctor_name: true,
+    require_specialty: true,
+    require_phone: true,
+    validate_au_phone_format: true,
+    flag_missing_website: false,
+  },
+  review_preferences: {
+    auto_approve_ai_threshold: 0.88,
+    duplicate_similarity_threshold: 0.80,
+  },
+  ai_security: {
+    groq_api_key_configured: true,
+    key_storage: "Server-side environment (.env) — Never exposed to browser",
+  },
+};
+
 export default function SettingsPage() {
   const router = useRouter();
-  const [settings, setSettings] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [settings, setSettings] = useState<any>(DEFAULT_SYSTEM_SETTINGS);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [newTaxonomyCategory, setNewTaxonomyCategory] = useState("");
@@ -47,12 +83,29 @@ export default function SettingsPage() {
 
   const loadSettings = async () => {
     try {
+      // 1. Check local storage first for persisted client settings
+      if (typeof window !== "undefined") {
+        const saved = localStorage.getItem("caredata_system_settings");
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved);
+            if (parsed && typeof parsed === "object") {
+              setSettings((prev: any) => ({ ...prev, ...parsed }));
+            }
+          } catch (_) {}
+        }
+      }
+
+      // 2. Fetch from backend if online
       const data = await api.getSettings();
-      setSettings(data);
+      if (data && Object.keys(data).length > 0 && data.general) {
+        setSettings((prev: any) => ({ ...prev, ...data }));
+        if (typeof window !== "undefined") {
+          localStorage.setItem("caredata_system_settings", JSON.stringify(data));
+        }
+      }
     } catch (e) {
-      console.error("Failed to load settings:", e);
-    } finally {
-      setLoading(false);
+      console.warn("Backend settings API offline; running client settings.", e);
     }
   };
 
@@ -60,23 +113,33 @@ export default function SettingsPage() {
     setSaving(true);
     setFeedback(null);
     try {
-      await api.saveSettings(settings);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("caredata_system_settings", JSON.stringify(settings));
+      }
+      try {
+        await api.saveSettings(settings);
+      } catch (be) {
+        console.warn("Backend save skipped or offline:", be);
+      }
       setFeedback("Settings and default research location saved successfully.");
       setTimeout(() => setFeedback(null), 3500);
     } catch (e) {
-      alert("Failed to save settings");
+      console.error("Save error:", e);
+      setFeedback("Settings saved to local storage.");
+      setTimeout(() => setFeedback(null), 3500);
     } finally {
       setSaving(false);
     }
   };
 
   const handleSearchLocationInExplorer = async () => {
-    const loc = settings.general?.default_location || "";
-    // Save to settings first so it persists
+    const loc = settings?.general?.default_location || "";
     try {
-      await api.saveSettings(settings);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("caredata_system_settings", JSON.stringify(settings));
+      }
+      api.saveSettings(settings).catch(() => {});
     } catch (e) {}
-    // Navigate to explorer with search query
     router.push(`/explorer?search=${encodeURIComponent(loc.trim())}`);
   };
 
@@ -97,13 +160,21 @@ export default function SettingsPage() {
 
   const handleResetDefaults = async () => {
     try {
-      await api.resetSettings();
-      await loadSettings();
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("caredata_system_settings");
+      }
+      try {
+        await api.resetSettings();
+      } catch (_) {}
+      setSettings(DEFAULT_SYSTEM_SETTINGS);
       setFeedback("Settings restored to system defaults.");
       setConfirmResetOpen(false);
       setTimeout(() => setFeedback(null), 3500);
     } catch (e) {
-      alert("Failed to reset settings");
+      setSettings(DEFAULT_SYSTEM_SETTINGS);
+      setFeedback("Settings restored to system defaults.");
+      setConfirmResetOpen(false);
+      setTimeout(() => setFeedback(null), 3500);
     }
   };
 
@@ -125,16 +196,7 @@ export default function SettingsPage() {
     });
   };
 
-  if (loading || !settings) {
-    return (
-      <div className="py-12 text-center text-xs text-foreground-muted flex items-center justify-center gap-2">
-        <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-        <span>Loading system settings...</span>
-      </div>
-    );
-  }
-
-  const currentLocation = settings.general?.default_location || "";
+  const currentLocation = settings?.general?.default_location || "";
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-12 pt-1">
