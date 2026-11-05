@@ -32,7 +32,7 @@
 
 ## Phase 1: Project Genesis & Core Pipeline Inception (Nov 1, 2026)
 
-### Prompt #1 (Step 0 — `2026-11-01T14:48:47Z`) *(Included 1 attachment/image)*
+### Prompt #1 
 
 ```text
 I have attached the project document. Please go through it properly before starting the development.
@@ -58,7 +58,7 @@ My main expectation is simple: the final result should look like a professionall
 
 ---
 
-### Prompt #2 (Step 173 — `2026-11-01T15:30:13Z`)
+### Prompt #2 
 
 ```text
 1 of 1 errorNext.js (14.2.35) is outdated [(learn more)](https://nextjs.org/docs/messages/version-staleness)
@@ -77,7 +77,7 @@ Show collapsed frames  this error i get fix it
 
 ---
 
-### Prompt #3 (Step 193 — `2026-11-01T15:34:38Z`)
+### Prompt #3 
 
 ```text
 1 of 1 errorNext.js (14.2.35) is outdated [(learn more)](https://nextjs.org/docs/messages/version-staleness)
@@ -108,7 +108,7 @@ Next.js
 
 ---
 
-### Prompt #4 (Step 210 — `2026-11-01T15:37:47Z`)
+### Prompt #4
 
 ```text
 1 of 1 errorNext.js (14.2.35) is outdated [(learn more)](https://nextjs.org/docs/messages/version-staleness)
@@ -129,7 +129,7 @@ Show collapsed frames
 
 ## Phase 2: First-Generation UI Polish & Clarity Enhancements (Nov 1, 2026)
 
-### Prompt #5 (Step 236 — `2026-11-01T15:46:57Z`)
+### Prompt #5 
 
 ```text
 I checked the website, but honestly, the current design doesn't look that good and some sections are confusing. There are too many unnecessary elements, and I can't clearly understand the purpose of some cards, buttons and information.
@@ -158,7 +158,7 @@ I want the final website to feel like a real healthcare SaaS product that someon
 
 ---
 
-### Prompt #6 (Step 423 — `2026-11-01T17:40:33Z`)
+### Prompt #6 
 
 ```text
 I want to improve the overall look and feel of the website. Right now, some sections are unnecessary and a few things are not very easy to understand. I want the website to look much more professional, modern and user-friendly.
@@ -172,7 +172,7 @@ I want someone visiting the website for the first time to understand what the ap
 
 ---
 
-### Prompt #7 (Step 515 — `2026-11-01T18:06:54Z`)
+### Prompt #7 
 
 ```text
 ok stop both task
@@ -183,7 +183,7 @@ ok stop both task
 
 ---
 
-### Prompt #8 (Step 527 — `2026-11-02T06:41:50Z`)
+### Prompt #8 
 
 ```text
 run both backend and frontend
@@ -196,7 +196,7 @@ run both backend and frontend
 
 ## Phase 3: Clinical UX Refinement, Input Fixes & Dark Mode (Nov 2, 2026)
 
-### Prompt #9 (Step 554 — `2026-11-02T06:48:20Z`) *(Included 1 attachment/image)*
+### Prompt #9 
 
 ```text
 I noticed that when I type something in the input boxes in the Account section, the text is not visible. Please check and fix this issue so users can clearly see what they are typing.
@@ -210,7 +210,7 @@ Please check the functionality as well as the design, and make sure everything w
 
 ---
 
-### Prompt #10 (Step 585 — `2026-11-02T07:07:51Z`) *(Included 1 attachment/image)*
+### Prompt #10 
 
 ```text
 Please improve the UI/UX of the entire website. When I click on "View", the page doesn't look clear and I can't understand the information properly. Please fix that and also check what the "# Job" section in the header means. If it's unnecessary, remove it.
@@ -225,7 +225,7 @@ Please make sure a first-time visitor can easily understand what the platform do
 
 ---
 
-### Prompt #11 (Step 692 — `2026-11-02T07:24:08Z`) *(Included 1 attachment/image)*
+### Prompt #11  *(Included 1 attachment/image)*
 
 ```text
 The overall design is good, but the background and boxes still look too similar in both light and dark modes. Please give the cards, boxes and input fields some subtle matching colours so they stand out from the main background. Use premium healthcare-inspired shades like soft mint, sage green and muted teal. Keep it elegant, balanced and slightly luxurious, without making it too colourful. Keep the existing layout and functionality unchanged.
@@ -238,7 +238,7 @@ The overall design is good, but the background and boxes still look too similar 
 
 ---
 
-### Prompt #12 (Step 816 — `2026-11-02T07:57:27Z`)
+### Prompt #12 
 
 ```text
 The dark mode still doesn't look right. The background of almost every box and card is completely black, which makes the website look dull. Since this is a healthcare platform, I want a little more colour while keeping the overall design professional.
@@ -265,7 +265,7 @@ add hover effect also and dont make it colourfull
 
 ---
 
-### Prompt #14 (Step 1069 — `2026-11-02T09:13:55Z`)
+### Prompt #14 
 
 ```text
 tell me what this project does actually do and what problem solve and if someone ask me what it actully doo and how it works
@@ -277,7 +277,7 @@ tell me what this project does actually do and what problem solve and if someone
 
 ---
 
-### Prompt #15 (Step 1071 — `2026-11-02T09:15:27Z`)
+### Prompt #15 
 
 ```text
 give me in document
@@ -289,7 +289,7 @@ give me in document
 
 ---
 
-### Prompt #16 (Step 1077 — `2026-11-02T09:46:32Z`)
+### Prompt #16 
 
 ```text
 stop both
@@ -301,7 +301,7 @@ stop both
 
 ---
 
-### Prompt #17 (Step 1089 — `2026-11-02T09:47:46Z`)
+### Prompt #17 
 
 ```text
 add this project into my github
@@ -313,7 +313,7 @@ add this project into my github
 
 ---
 
-### Prompt #18 (Step 1120 — `2026-11-02T09:55:43Z`)
+### Prompt #18 
 
 ```text
 https://github.com/amangari115322/CareAI_Health_Intelligent.git this is my new repo link add here in this project
@@ -327,7 +327,7 @@ https://github.com/amangari115322/CareAI_Health_Intelligent.git this is my new r
 
 ## Phase 4: Design Exploration, User Feedback & Reversion (Nov 2, 2026)
 
-### Prompt #19 (Step 1146 — `2026-11-02T16:48:17Z`) *(Included 1 attachment/image)*
+### Prompt #19 
 
 ```text
 i want this type of ui look
@@ -339,7 +339,7 @@ i want this type of ui look
 
 ---
 
-### Prompt #20 (Step 1204 — `2026-11-02T17:01:29Z`)
+### Prompt #20 
 
 ```text
 I don't want this new design direction. I want to keep the existing layout and overall style, but improve the colour combination and user experience.
@@ -353,7 +353,7 @@ Make both light and dark modes look polished and comfortable to use. Focus on pr
 
 ---
 
-### Prompt #21 (Step 1287 — `2026-11-02T17:19:41Z`)
+### Prompt #21 
 
 ```text
 
@@ -365,7 +365,7 @@ Make both light and dark modes look polished and comfortable to use. Focus on pr
 
 ---
 
-### Prompt #22 (Step 1323 — `2026-11-02T17:26:33Z`)
+### Prompt #22 
 
 ```text
 whatever have you changed undo it
@@ -377,7 +377,7 @@ whatever have you changed undo it
 
 ---
 
-### Prompt #23 (Step 1343 — `2026-11-02T17:53:04Z`)
+### Prompt #23 
 
 ```text
 stop both
@@ -391,7 +391,7 @@ stop both
 
 ## Phase 5: Healthcare Intelligence Vision & Global Architecture (Nov 4, 2026)
 
-### Prompt #24 (Step 1355 — `2026-11-04T06:13:00Z`)
+### Prompt #24 
 
 ```text
 CareData AI: From data cleaning to healthcare data intelligence
@@ -524,7 +524,7 @@ That transforms CareData AI from a data-cleaning project into a serious healthca
 
 ---
 
-### Prompt #25 (Step 1381 — `2026-11-04T06:20:27Z`)
+### Prompt #25 
 
 ```text
 run backend and frontend
@@ -537,7 +537,7 @@ run backend and frontend
 
 ## Phase 6: Senior UI Polish, Multi-Jurisdiction Expansion & System Fixes (Nov 4, 2026)
 
-### Prompt #26 (Step 1396 — `2026-11-04T06:39:24Z`)
+### Prompt #26 
 
 ```text
 The landing page looks good, but the dark mode option is not working properly. Also, the other pages don't look professional in dark mode. Some colours and elements look too childish. I want a more mature, clean and premium design across the entire application, in both light and dark modes.
@@ -556,7 +556,7 @@ Take this as a serious product, not just a demo dashboard. I want it to look and
 
 ---
 
-### Prompt #27 (Step 1564 — `2026-11-04T07:25:16Z`) *(Included 1 attachment/image)*
+### Prompt #27  *(Included 1 attachment/image)*
 
 ```text
 I noticed that the Default Search Location field is not working properly. When I try to delete the existing location name, it doesn't get removed. Please check this field, fix the issue and make sure users can easily edit, delete and update the location. Also test the functionality to ensure it works correctly.
@@ -568,7 +568,7 @@ I noticed that the Default Search Location field is not working properly. When I
 
 ---
 
-### Prompt #28 (Step 1627 — `2026-11-04T07:31:11Z`) *(Included 1 attachment/image)*
+### Prompt #28  *(Included 1 attachment/image)*
 
 ```text
 One more issue I noticed is in the landing page header. There is a section called "Global Standard". When I click the dropdown arrow, the dropdown opens, but the background appears white and the text is not visible properly. The text only becomes visible when I hover over it.
@@ -581,7 +581,7 @@ Please test it in both light and dark modes and make sure the dropdown opens, di
 
 ---
 
-### Prompt #29 (Step 1667 — `2026-11-04T07:51:16Z`) *(Included 1 attachment/image)*
+### Prompt #29 *(Included 1 attachment/image)*
 
 ```text
 I noticed a few issues while using the website. Please go through the entire application and fix them properly.
