@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import * as XLSX from "xlsx";
 import {
   UploadCloud,
   FileSpreadsheet,
@@ -44,6 +45,34 @@ function parseCSV(text: string): Record<string, string>[] {
     rows.push(rowObj);
   }
   return rows;
+}
+
+// In-Browser Spreadsheet Parser for both XLSX and CSV
+async function parseSpreadsheetFile(file: File): Promise<{ headers: string[]; rows: Record<string, any>[] }> {
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const workbook = XLSX.read(arrayBuffer, { type: "array" });
+    if (workbook.SheetNames && workbook.SheetNames.length > 0) {
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
+      const rawRows = XLSX.utils.sheet_to_json<Record<string, any>>(worksheet, { defval: "" });
+      if (rawRows.length > 0) {
+        const headers = Object.keys(rawRows[0]);
+        return { headers, rows: rawRows };
+      }
+    }
+  } catch (xlsxErr) {
+    console.warn("SheetJS parse attempt failed, falling back to raw text:", xlsxErr);
+  }
+
+  // Fallback to text CSV parser
+  const text = await file.text();
+  const rows = parseCSV(text);
+  if (rows.length === 0) {
+    throw new Error("Unable to parse records. Please ensure your file is a valid .csv or .xlsx spreadsheet with column headers.");
+  }
+  const headers = Object.keys(rows[0]);
+  return { headers, rows };
 }
 
 // Auto-map incoming columns to standard healthcare directory fields
@@ -138,6 +167,7 @@ export default function UploadPage() {
       const file = e.target.files[0];
       setIsSample(false);
       await loadPreview(file, false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
@@ -149,90 +179,106 @@ export default function UploadPage() {
   const loadPreview = async (file: File | null, useSample: boolean) => {
     setLoading(true);
     setError(null);
-    try {
-      const formData = new FormData();
-      if (file) {
-        formData.append("file", file);
-      }
-      formData.append("use_sample", String(useSample));
 
-      const res = await api.previewUpload(formData);
-      setPreviewData(res);
-      setColumnMapping(res.suggested_mapping);
-      setStep("preview");
-    } catch (err: any) {
-      console.warn("Backend API upload call was unreachable, activating client-side parsing fallback...", err);
-
-      // ── ROBUST CLIENT-SIDE FALLBACK ──────────────────────────
-      if (file) {
-        try {
-          const text = await file.text();
-          const rows = parseCSV(text);
-          if (rows.length > 0) {
-            const headers = Object.keys(rows[0]);
-            const mapping = autoMapColumns(headers);
-            const clientPreview: UploadPreviewResponse = {
-              file_name: file.name,
-              file_size_bytes: file.size,
-              file_format: file.name.toLowerCase().endsWith(".csv") ? "CSV" : "XLSX",
-              row_count: rows.length,
-              validation_status: "Verified format (Client-Side Parser)",
-              headers,
-              preview_rows: rows.slice(0, 15),
-              suggested_mapping: mapping,
-              supported_targets: [
-                "Provider Name",
-                "Specialty",
-                "Practice Name",
-                "Address",
-                "Phone",
-                "Website",
-                "Source URL",
-                "Ignore",
-              ],
-            };
-            setPreviewData(clientPreview);
-            setColumnMapping(mapping);
-            setStep("preview");
-            return;
+    // ── CASE 1: LOAD PILOT SAMPLE DATASET ──────────────────────
+    if (useSample) {
+      let sampleRows: Record<string, any>[] = samplePilotRows;
+      let sampleHeaders = ["Doctor", "Specialty Description", "Clinic", "Suburb", "Address", "State", "Postcode", "Phone", "Website"];
+      try {
+        const res = await fetch("/sample_healthcare_dataset.csv");
+        if (res.ok) {
+          const text = await res.text();
+          const parsed = parseCSV(text);
+          if (parsed.length > 0) {
+            sampleRows = parsed;
+            sampleHeaders = Object.keys(parsed[0]);
           }
-        } catch (clientErr) {
-          console.error("Client parsing error:", clientErr);
         }
-      } else if (useSample) {
-        const headers = ["Doctor Name", "Specialty Notes", "Clinic Name", "Clinic Phone", "Address", "Suburb", "State"];
-        const mapping = autoMapColumns(headers);
-        const samplePreview: UploadPreviewResponse = {
-          file_name: "sydney_gp_list.xlsx",
-          file_size_bytes: 25621,
-          file_format: "XLSX",
-          row_count: 150,
-          validation_status: "Pre-Packaged Pilot Dataset (150 Records)",
-          headers,
-          preview_rows: samplePilotRows,
-          suggested_mapping: mapping,
-          supported_targets: [
-            "Provider Name",
-            "Specialty",
-            "Practice Name",
-            "Address",
-            "Phone",
-            "Website",
-            "Source URL",
-            "Ignore",
-          ],
-        };
-        setPreviewData(samplePreview);
-        setColumnMapping(mapping);
-        setStep("preview");
-        return;
-      }
+      } catch (_) {}
 
-      setError(
-        err.message?.includes("Failed to fetch")
-          ? "Unable to connect to the backend server. For instant offline preview, please upload a standard CSV file."
-          : err.message || "Failed to load and preview file"
-      );
+      const mapping = autoMapColumns(sampleHeaders);
+      const samplePreview: UploadPreviewResponse = {
+        file_name: "sydney_gp_list.xlsx",
+        file_size_bytes: 25621,
+        file_format: "XLSX",
+        row_count: sampleRows.length,
+        validation_status: `Pre-Packaged Pilot Dataset (${sampleRows.length} Records)`,
+        headers: sampleHeaders,
+        preview_rows: sampleRows.slice(0, 15),
+        suggested_mapping: mapping,
+        supported_targets: [
+          "Provider Name",
+          "Specialty",
+          "Practice Name",
+          "Address",
+          "Phone",
+          "Website",
+          "Source URL",
+          "Ignore",
+        ],
+      };
+      setPreviewData(samplePreview);
+      setColumnMapping(mapping);
+      setStep("preview");
+      setLoading(false);
+      return;
+    }
+
+    // ── CASE 2: USER UPLOADED SPREADSHEET (CSV or XLSX) ────────
+    if (!file) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // 1. Instant client-side parsing using SheetJS & native buffer
+      const { headers, rows } = await parseSpreadsheetFile(file);
+      const mapping = autoMapColumns(headers);
+      const ext = file.name.split(".").pop()?.toUpperCase() || "CSV";
+
+      const clientPreview: UploadPreviewResponse = {
+        file_name: file.name,
+        file_size_bytes: file.size,
+        file_format: ext,
+        row_count: rows.length,
+        validation_status: `Verified format (${rows.length.toLocaleString()} records loaded)`,
+        headers,
+        preview_rows: rows.slice(0, 15),
+        suggested_mapping: mapping,
+        supported_targets: [
+          "Provider Name",
+          "Specialty",
+          "Practice Name",
+          "Address",
+          "Phone",
+          "Website",
+          "Source URL",
+          "Ignore",
+        ],
+      };
+
+      // Set immediately: user never sees a delay or network failure
+      setPreviewData(clientPreview);
+      setColumnMapping(mapping);
+      setStep("preview");
+
+      // 2. Opportunistic background sync with backend if online
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("use_sample", "false");
+        const res = await api.previewUpload(formData);
+        if (res && res.headers && res.headers.length > 0) {
+          setPreviewData(res);
+          setColumnMapping(res.suggested_mapping);
+        }
+      } catch (backendErr) {
+        // Backend offline or cold-starting: completely normal on Vercel frontend-only deployments
+        console.info("Backend unreachable; running client-side parsed dataset.");
+      }
+    } catch (err: any) {
+      console.error("Client parsing error:", err);
+      setError(err.message || "Failed to load and preview file. Please upload a valid CSV or XLSX spreadsheet.");
     } finally {
       setLoading(false);
     }
@@ -350,12 +396,29 @@ export default function UploadPage() {
           {/* Main Drag-and-Drop Area */}
           <div
             onClick={() => fileInputRef.current?.click()}
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            onDragEnter={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            onDrop={async (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                const file = e.dataTransfer.files[0];
+                setIsSample(false);
+                await loadPreview(file, false);
+              }
+            }}
             className="border-2 border-dashed border-emerald-400 dark:border-emerald-600/70 hover:border-emerald-500 rounded-2xl p-10 text-center bg-gradient-to-br from-emerald-50/70 via-surface to-emerald-50/40 dark:from-[#0c2422] dark:via-surface dark:to-[#09151c] transition-all cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-1 group"
           >
             <input
               ref={fileInputRef}
               type="file"
-              accept=".csv,.xlsx"
+              accept=".csv,.xlsx,.xls"
               className="hidden"
               onChange={handleFileChange}
             />

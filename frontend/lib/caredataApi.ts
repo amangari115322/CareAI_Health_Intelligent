@@ -198,7 +198,7 @@ export const api = {
       body: formData,
     });
     if (!res.ok) {
-      const err = await res.json();
+      const err = await res.json().catch(() => ({ detail: `Upload preview failed (${res.status} ${res.statusText})` }));
       throw new Error(err.detail || "Failed to preview file");
     }
     return res.json();
@@ -215,7 +215,7 @@ export const api = {
       body: JSON.stringify(payload),
     });
     if (!res.ok) {
-      const err = await res.json();
+      const err = await res.json().catch(() => ({ detail: `Upload preview failed (${res.status} ${res.statusText})` }));
       throw new Error(err.detail || "Failed to process upload");
     }
     return res.json();
