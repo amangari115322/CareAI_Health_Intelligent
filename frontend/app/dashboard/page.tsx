@@ -19,16 +19,17 @@ import {
   Check,
   Loader2,
   AlertCircle,
+  Activity,
 } from "lucide-react";
 import { api, DashboardStats, DashboardCharts, ActiveJob } from "../../lib/caredataApi";
-import { ProcessingTrackerModal } from "../../components/ProcessingTrackerModal";
+import { ProcessingTrackerModal, defaultPipelineJob } from "../../components/ProcessingTrackerModal";
 import { PlatformGuideModal } from "../../components/PlatformGuideModal";
 
 export default function DashboardPage() {
   const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [charts, setCharts] = useState<DashboardCharts | null>(null);
-  const [activeJob, setActiveJob] = useState<ActiveJob | null>(null);
+  const [activeJob, setActiveJob] = useState<ActiveJob | null>(defaultPipelineJob);
   const [trackerOpen, setTrackerOpen] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
   const [hoveredPoint, setHoveredPoint] = useState<{ stage: string; value: string; x: number; y: number } | null>(null);
@@ -553,14 +554,18 @@ export default function DashboardPage() {
                       {file.href ? (
                         <Link
                           href={file.href}
-                          className="px-3 py-1 text-xs font-semibold rounded-lg border border-border hover:bg-surface-muted text-foreground transition-colors"
+                          className="inline-block px-3 py-1 text-xs font-semibold rounded-lg border border-border hover:bg-surface-muted text-foreground transition-colors"
                         >
                           {file.action}
                         </Link>
                       ) : (
                         <button
-                          onClick={file.onClick}
-                          className="px-3 py-1 text-xs font-semibold rounded-lg border border-border hover:bg-surface-muted text-foreground transition-colors"
+                          type="button"
+                          onClick={() => {
+                            if (file.onClick) file.onClick();
+                            else setTrackerOpen(true);
+                          }}
+                          className="px-3.5 py-1 text-xs font-semibold rounded-lg border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 transition-all cursor-pointer active:scale-95 shadow-sm"
                         >
                           {file.action}
                         </button>
@@ -648,10 +653,12 @@ export default function DashboardPage() {
 
           <div className="pt-4 border-t border-border mt-4">
             <button
+              type="button"
               onClick={() => setTrackerOpen(true)}
-              className="w-full py-2 text-center text-xs font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white transition-colors shadow-sm"
+              className="w-full py-2.5 text-center text-xs font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white transition-all shadow-sm hover:shadow active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
             >
-              Inspect Active Engine
+              <Activity className="w-3.5 h-3.5" />
+              <span>Inspect Active Engine</span>
             </button>
           </div>
         </div>
