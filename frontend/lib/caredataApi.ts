@@ -3,7 +3,10 @@
  * Fully typed client communicating with FastAPI backend (http://localhost:8000/api)
  */
 
-const rawBase = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/+$/, "");
+let rawBase = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").trim().replace(/\/+$/, "");
+if (!rawBase.startsWith("http://") && !rawBase.startsWith("https://")) {
+  rawBase = `https://${rawBase}`;
+}
 const API_BASE = rawBase.endsWith("/api") ? rawBase : `${rawBase}/api`;
 
 export interface DashboardStats {

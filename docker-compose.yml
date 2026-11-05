@@ -1,29 +1,31 @@
 version: "3.9"
 
 services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: blueprintai-postgres
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: caredata-backend
     restart: unless-stopped
+    ports:
+      - "8000:8000"
     environment:
-      POSTGRES_DB: blueprintai
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./backend/caredata.db:/app/caredata.db
+      - ./backend/data:/app/data
 
-  redis:
-    image: redis:7-alpine
-    container_name: blueprintai-redis
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=http://backend:8000
+    container_name: caredata-frontend
     restart: unless-stopped
     ports:
-      - "6379:6379"
-    command: redis-server --appendonly yes
-    volumes:
-      - redis_data:/data
-
-volumes:
-  postgres_data:
-  redis_data:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - backend
